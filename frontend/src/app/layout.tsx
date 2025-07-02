@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Image from 'next/image'
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,11 +26,45 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+		<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+			<header>
+				<div className="container mx-auto flex items-center">
+					<div className="flex items-center">
+						<div className="relative h-20 w-60">
+							<Image
+								className="object-contain"
+								src="/images/fulllogo.png"
+								fill
+								alt='logo'
+							/>
+						</div>
+						<nav className="flex gap-5">
+							<a href="/login">Feed</a>
+							<a href="/login">Discover</a>
+							<a href="/login">Login</a>
+						</nav>
+					</div>
+
+					<div className="flex items-center">
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+							<path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+						</svg>
+						<Popover className="relative">
+							<PopoverButton><Image className="rounded-full" src='/images/dummy.png' height={30} width={30} alt='profile'/></PopoverButton>
+							<PopoverPanel anchor="bottom" className="flex flex-col">
+								<a href="/analytics">Analytics</a>
+								<a href="/engagement">Engagement</a>
+								<a href="/security">Security</a>
+								<a href="/integrations">Integrations</a>
+							</PopoverPanel>
+						</Popover>
+					</div>
+				</div>
+			</header>
+			<main>
+				{children}
+			</main>
+		</body>
     </html>
   );
 }
