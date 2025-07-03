@@ -4,9 +4,17 @@ import { useEffect, useState } from "react";
 
 export default function PingTest() {
   const [response, setResponse] = useState("");
-
+  const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
   useEffect(() => {
-    fetch("http://localhost:8000/api/films")
+    fetch(`${apiUrl}/api/user`, {
+      method: 'GET',
+      credentials: 'include', // important if you're using cookies for auth
+      headers: {
+        'Content-Type': 'application/json',
+        // If using token auth, include the Authorization header like below:
+        // 'Authorization': `Bearer ${yourToken}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => setResponse(data.title))
       .catch((err) => {

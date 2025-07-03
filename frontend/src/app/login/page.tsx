@@ -9,8 +9,9 @@ export default function Login() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-
-    const res = await fetch("http://localhost:8000/api/login", {
+    const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
+    console.log('API URL:', apiUrl); // Debugging output
+    const res = await fetch(`${apiUrl}/api/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include", // belangrijk voor cookies
