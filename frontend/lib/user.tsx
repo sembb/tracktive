@@ -1,14 +1,17 @@
 export async function fetchUserFromServer(cookieHeader?: string) {
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
     console.log('Fetching user from:', apiUrl);
+    console.log('Using cookie header:', cookieHeader);
     try {
         const res = await fetch(`${apiUrl}/api/user`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
-            ...(cookieHeader ? { cookie: cookieHeader } : {}),
+            ...(cookieHeader ? { cookieHeader } : {}),
         },
         });
+    
 
         if (!res.ok) {
             // Probeer een error message van de backend mee te lezen

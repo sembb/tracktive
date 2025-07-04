@@ -54,13 +54,3 @@ Route::post('/register', function(Request $request) {
 
     return response()->json(['message' => 'Registratie gelukt!'], 201);
 });
-
-Route::get('/test-ip', function () {
-  return response()->json(['message' => 'IP test werkt']);
-});
-
-Route::get('/test-cookie', function(Request $request) {
-    return response()->json([
-        'auth_token' => $request->cookie('auth_token')
-    ]);
-});

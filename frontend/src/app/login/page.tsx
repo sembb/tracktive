@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "../../../lib/stores/user";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -20,6 +21,7 @@ export default function Login() {
 
     if (res.ok) {
       const data = await res.json();
+      useAuth.getState().setUser(data.user)
       setMessage(`Welkom, ${data.user.name}`);
       // Hier kan je token opslaan of user status bijhouden
     } else {
