@@ -1,6 +1,13 @@
 @import "tailwindcss";
+@plugin "daisyui";
+@import 'flatpickr/dist/flatpickr.min.css';
 @plugin "flyonui";
+@import "flyonui/variants.css";
+@source "./node_modules/flyonui/flyonui.js";
 @plugin "@iconify/tailwind4";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;

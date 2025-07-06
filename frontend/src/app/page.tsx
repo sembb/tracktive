@@ -1,5 +1,4 @@
 import Image from "next/image";
-import PingTest from "./apitest";
 
 export default function Home() {
   return (
@@ -24,7 +23,6 @@ export default function Home() {
           <li className="tracking-[-.01em]">
             Save and see your changes instantly.
           </li>
-          <PingTest />
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">

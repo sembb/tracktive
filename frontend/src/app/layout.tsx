@@ -6,6 +6,7 @@ import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import ProfileDropdown from './profileDropdown';
 import { fetchUserFromServer } from '../../lib/user';
 import { cookies } from 'next/headers';
+import FlyonuiScript from "./components/FlyonuiScript";
 
 
 const geistSans = Geist({
@@ -31,7 +32,7 @@ export default async function RootLayout({
 	const cookieStore = await cookies();
 	const cookieHeader = cookieStore.get('auth_token')?.value;
 	return (
-		<html lang="en">
+		<html lang="en" data-theme="flyon">
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<header>
 					<div className="container mx-auto flex items-center justify-between">
@@ -62,6 +63,7 @@ export default async function RootLayout({
 				<main>
 					{children}
 				</main>
+				<FlyonuiScript />
 			</body>
 		</html>
 	);
