@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import flatpickr from 'flatpickr';
+import SubmitProfileChange from './SubmitProfileChange';
 
 export default function JSValidationForm() {
-      useEffect(() => {
-    // Initialize flatpickr
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
-      flatpickr('#jsPickr', {
+      flatpickr('#birth_date', {
         allowInput: true,
         monthSelectorType: 'static',
       });
@@ -34,37 +36,24 @@ export default function JSValidationForm() {
       });
     }
   }, []);
+
   return (
     <div className="bg-base-100 w-full rounded-lg shadow-base-300/20 shadow-sm">
       <h5 className="bg-base-300/10 rounded-t-lg p-4 text-xl font-bold">JS Validation</h5>
       <div className="w-full p-4">
-        <form className="needs-validation peer grid gap-y-4" noValidate>
+        <form className="needs-validation peer grid gap-y-4" noValidate ref={formRef}>
           {/* Account Details */}
           <div className="w-full">
             <h6 className="text-lg font-semibold">1. Account Details</h6>
             <hr className="mb-4 mt-2" />
           </div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-              <label className="label-text" htmlFor="firstName">First Name</label>
-              <input id="firstName" type="text" placeholder="John" className="input" required />
-              <span className="error-message">Please enter your name.</span>
-              <span className="success-message">Looks good!</span>
-            </div>
-            <div>
-              <label className="label-text" htmlFor="lastName">Last Name</label>
-              <input id="lastName" type="text" placeholder="Doe" className="input" required />
-              <span className="error-message">Please enter your last name.</span>
-              <span className="success-message">Looks good!</span>
-            </div>
-          </div>
 
-          {/* Email and Password */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <label className="label-text" htmlFor="userEmail">Email</label>
               <input
                 id="userEmail"
+                name="email" // ✅ added
                 type="email"
                 className="input"
                 placeholder="john@gmail.com"
@@ -79,6 +68,7 @@ export default function JSValidationForm() {
               <div className="input">
                 <input
                   id="userPassword"
+                  name="password" // ✅ added
                   type="password"
                   className="grow"
                   placeholder="Enter password"
@@ -105,15 +95,22 @@ export default function JSValidationForm() {
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label className="label-text" htmlFor="userProfile">Profile Pic</label>
-              <input id="userProfile" type="file" className="input" required />
+              <label className="label-text" htmlFor="avatar_url">Profile Pic</label>
+              <input
+                id="avatar_url"
+                name="avatar_url" // ✅ added
+                type="file"
+                className="input"
+                required
+              />
               <span className="error-message">Please select the file</span>
               <span className="success-message">Looks good!</span>
             </div>
             <div>
-              <label className="label-text" htmlFor="jsPickr">DOB</label>
+              <label className="label-text" htmlFor="birth_date">DOB</label>
               <input
-                id="jsPickr"
+                id="birth_date"
+                name="birth_date" // ✅ added
                 type="text"
                 className="input"
                 placeholder="YYYY-MM-DD"
@@ -126,8 +123,14 @@ export default function JSValidationForm() {
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-              <label className="label-text" htmlFor="userCountry">Pick your Country</label>
-              <select className="select" id="userCountry" aria-label="Select Country" required>
+              <label className="label-text" htmlFor="country">Pick your Country</label>
+              <select
+                className="select"
+                id="country"
+                name="country" // ✅ added
+                aria-label="Select Country"
+                required
+              >
                 <option value="">Select Country</option>
                 <option value="usa">USA</option>
                 <option value="uk">UK</option>
@@ -141,11 +144,25 @@ export default function JSValidationForm() {
             <div>
               <div className="label-text">Gender</div>
               <div className="flex items-center gap-2">
-                <input type="radio" id="male" name="radio-0" className="radio radio-primary" required />
+                <input
+                  type="radio"
+                  id="male"
+                  name="gender" // ✅ changed from radio-0
+                  value="male" // ✅ added
+                  className="radio radio-primary"
+                  required
+                />
                 <label className="label-text text-base" htmlFor="male">Male</label>
               </div>
               <div className="flex items-center gap-2">
-                <input type="radio" id="female" name="radio-0" className="radio radio-primary" required />
+                <input
+                  type="radio"
+                  id="female"
+                  name="gender" // ✅ changed from radio-0
+                  value="female" // ✅ added
+                  className="radio radio-primary"
+                  required
+                />
                 <label className="label-text text-base" htmlFor="female">Female</label>
               </div>
               <span className="error-message">Please select your Gender</span>
@@ -154,10 +171,11 @@ export default function JSValidationForm() {
           </div>
 
           <div className="w-full">
-            <label className="label-text" htmlFor="userBio">Bio</label>
+            <label className="label-text" htmlFor="bio">Bio</label>
             <textarea
               className="textarea min-h-20 resize-none"
-              id="userBio"
+              id="bio"
+              name="bio" // ✅ added
               placeholder="Hello!!!"
               required
             ></textarea>
@@ -167,7 +185,13 @@ export default function JSValidationForm() {
 
           <div>
             <div className="flex items-center gap-3">
-              <input type="checkbox" id="userSwitch" className="switch switch-primary" required />
+              <input
+                type="checkbox"
+                id="userSwitch"
+                name="subscribe_emails" // ✅ added
+                className="switch switch-primary"
+                required
+              />
               <label className="label-text text-base" htmlFor="userSwitch">
                 Send me related emails
               </label>
@@ -178,7 +202,13 @@ export default function JSValidationForm() {
 
           <div>
             <div className="flex items-center gap-3">
-              <input type="checkbox" className="checkbox checkbox-primary" id="userAgre" required />
+              <input
+                type="checkbox"
+                className="checkbox checkbox-primary"
+                id="userAgre"
+                name="agree_terms" // ✅ added
+                required
+              />
               <label className="label-text text-base" htmlFor="userAgre">
                 Agree to our terms and conditions
               </label>
@@ -189,9 +219,7 @@ export default function JSValidationForm() {
 
           {/* Submit button */}
           <div className="mt-4">
-            <button type="submit" name="submitButton" className="btn btn-primary">
-              Submit
-            </button>
+            <SubmitProfileChange formRef={formRef} />
           </div>
         </form>
       </div>

@@ -1,0 +1,49 @@
+'use client';
+
+import React, {RefObject} from 'react'
+
+type Props = {
+  formRef: RefObject<HTMLFormElement>;
+};
+
+export default function SubmitProfileChange({ formRef }: Props) {
+    const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
+    console.log('API URL:', apiUrl); // Debugging output
+
+    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        const form = formRef.current;
+        if (!form) {
+            console.error('Form not found');
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        const res1 = await fetch(`${apiUrl}/sanctum/csrf-cookie`, {
+		    credentials: "include",
+	    });
+        for (const [key, value] of formData.entries()) {
+  console.log(`${key}:`, value);
+}
+        const res = await fetch(`${apiUrl}/api/profiles`, {
+            method: "POST",
+            credentials: "include", // belangrijk voor cookies
+            body: formData,
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            // Hier kan je token opslaan of user status bijhouden
+            console.log('profile update gelukt')
+        } else {
+            console.log('profile update mislukt')
+        }
+    };
+
+  return (
+    <button onClick={handleSubmit} type="submit" name="submitButton" className="btn btn-primary">
+        Submit
+    </button>
+  )
+}

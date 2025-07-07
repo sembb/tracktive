@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateWithCookieToken;
+use App\Http\Controllers\UserProfileController;
 
 Route::post('/login', function(Request $request) {
     $domain = config('session.domain');
@@ -31,6 +32,10 @@ Route::post('/login', function(Request $request) {
 
 Route::middleware([AuthenticateWithCookieToken::class])->get('/user', function(Request $request) {
     return $request->user();
+});
+
+Route::middleware([AuthenticateWithCookieToken::class])->group(function () {
+    Route::apiResource('profiles', UserProfileController::class);
 });
 
 Route::middleware([AuthenticateWithCookieToken::class])->post('/logout', function(Request $request) {

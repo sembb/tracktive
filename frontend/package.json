@@ -28,6 +28,7 @@
     "@iconify-json/tabler": "^1.2.19",
     "@iconify/tailwind4": "^1.0.6",
     "@tailwindcss/postcss": "^4",
+    "@types/jquery": "^3.5.32",
     "@types/node": "20.19.4",
     "@types/react": "19.1.8",
     "@types/react-dom": "^19",

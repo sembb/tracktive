@@ -3,7 +3,6 @@
 import { useAuth } from '../../lib/stores/user'
 import React, { useState, useRef, useEffect } from 'react';
 import useLogout from '../../lib/logout';
-import { cookies } from 'next/headers';
 import { useLoadUser } from '../../lib/hooks/useLoadUser';
 
 
