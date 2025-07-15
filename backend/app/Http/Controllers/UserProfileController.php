@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\UserProfile;
 
@@ -31,14 +32,20 @@ class UserProfileController extends Controller
             'avatar_url' => 'nullable|image|max:2048',
         ]);
 
+        $profile = UserProfile::firstOrNew(['user_id' => auth()->id()]);
+
         if ($request->hasFile('avatar_url')) {
+            if ($profile->avatar_url && Storage::disk('public')->exists($profile->avatar_url)) {
+                Storage::disk('public')->delete($profile->avatar_url);
+            }
             $path = $request->file('avatar_url')->store('avatar_url', 'public');
         } else {
             // Handle no file uploaded case, e.g. set $path to null or default
             $path = null;
         }
 
-        $profile = new UserProfile($validated);
+        // Update fields
+        $profile->fill($validated);
         $profile->avatar_url = $path;
         $profile->user_id = auth()->id(); // set the logged in user's ID
         $profile->save();
