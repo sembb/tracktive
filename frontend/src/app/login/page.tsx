@@ -43,7 +43,7 @@ export default function Login() {
 
   return (
 
-    <div className="bg-white flex h-auto min-h-screen items-center justify-center overflow-x-hidden py-10">
+    <div className="flex h-auto min-h-screen items-center justify-center overflow-x-hidden py-10">
 		<div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8">
 			<div className="absolute">
 				<svg
@@ -56,7 +56,7 @@ export default function Login() {
 					{/* SVG paths here, exactly as in your original */}
 				</svg>
 			</div>
-			<div className="bg-white shadow-base-300/20 z-10 w-full space-y-6 rounded-xl p-6 shadow-md sm:min-w-md lg:p-8">
+			<div className="bg-slygray shadow-base-300/20 z-10 w-full space-y-6 rounded-xl p-6 shadow-md sm:min-w-md lg:p-8">
 				<div className="flex items-center gap-3">
 					<Image
 					src="/images/Logosmall.png"
@@ -86,34 +86,34 @@ export default function Login() {
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
 						required
-						className="input bg-white"
+						className="input"
 						/>
 					</div>
 					<div>
 						<label className="label-text" htmlFor="userPassword">
 						Password*
 						</label>
-						<div className="input relative flex items-center bg-white">
+						<div className="input relative flex items-center">
 							<input
-      type={showPassword ? "text" : "password"}
-      placeholder="Wachtwoord"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-      required
-      className="flex-grow"
+								type={showPassword ? "text" : "password"}
+								placeholder="Wachtwoord"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								required
+								className="flex-grow"
 							/>
-    <button
-      type="button"
-      className="absolute right-2"
-      aria-label="toggle password visibility"
-      onClick={() => setShowPassword((prev) => !prev)}
-    >
-      {showPassword ? (
-        <span className="icon-[tabler--eye-off] size-5"></span>
-      ) : (
-        <span className="icon-[tabler--eye] size-5"></span>
-      )}
-    </button>
+							<button
+							type="button"
+							className="absolute right-2 flex items-center"
+							aria-label="toggle password visibility"
+							onClick={() => setShowPassword((prev) => !prev)}
+							>
+							{showPassword ? (
+								<span className="icon-[tabler--eye-off] size-5"></span>
+							) : (
+								<span className="icon-[tabler--eye] size-5"></span>
+							)}
+							</button>
 						</div>
 					</div>
 					<div className="flex items-center justify-between">

@@ -60,7 +60,7 @@ export default async function RootLayout({
 						</div>
 					</div>
 				</header>
-				<main>
+				<main className='py-20'>
 					{children}
 				</main>
 				<FlyonuiScript />

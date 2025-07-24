@@ -23,6 +23,7 @@ export default function SubmitProfileChange({ formRef }: Props) {
         const res1 = await fetch(`${apiUrl}/sanctum/csrf-cookie`, {
 		    credentials: "include",
 	    });
+      console.log(res1);
         for (const [key, value] of formData.entries()) {
   console.log(`${key}:`, value);
 }

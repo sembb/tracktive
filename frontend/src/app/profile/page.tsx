@@ -38,7 +38,7 @@ export default function JSValidationForm() {
   }, []);
 
   return (
-    <div className="bg-base-100 w-full rounded-lg shadow-base-300/20 shadow-sm">
+    <div className="bg-slygray w-full rounded-lg shadow-base-300/20 shadow-sm container mx-auto">
       <h5 className="bg-base-300/10 rounded-t-lg p-4 text-xl font-bold">JS Validation</h5>
       <div className="w-full p-4">
         <form className="needs-validation peer grid gap-y-4" noValidate ref={formRef}>

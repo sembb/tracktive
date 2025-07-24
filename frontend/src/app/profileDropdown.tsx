@@ -45,7 +45,7 @@ export default function ProfileDropdown({ cookieHeader }: { cookieHeader?: strin
   const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
   return (
     <Menu>
-      <MenuButton className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-700 data-open:bg-gray-700">
+      <MenuButton className="border-white/10 border-solid border inline-flex items-center gap-2 rounded-md bg-slygray px-3 py-1.5 text-sm/6 font-semibold text-white focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-white/10 data-open:bg-white/10">
         {user ? <p>Welcome {user.name}</p> : <p>Please log in</p>}
         <ChevronDownIcon className="size-4 fill-white/60" />
       </MenuButton>
@@ -58,10 +58,10 @@ export default function ProfileDropdown({ cookieHeader }: { cookieHeader?: strin
           className="w-52 origin-top-right rounded-xl border border-white/5 bg-white/5 p-1 text-sm/6 text-white transition duration-100 ease-out [--anchor-gap:--spacing(1)] focus:outline-none data-closed:scale-95 data-closed:opacity-0"
         >
           <MenuItem>
-            <button>
+            <button onClick={() => router.push(`/user/${user.name}`)} className="flex items-center">
               <Image className='flex-shrink-0 object-cover mx-1 rounded-full w-9 h-9' src={user.profile?.avatar_url ? `${apiUrl}/storage/${user.profile?.avatar_url}` : '/images/dummy.png'} width={50} height={50} alt='profile picture'></Image>
               <div className="mx-1">
-                <h1 className="text-sm font-semibold text-gray-700 dark:text-gray-200">{user.name}</h1>
+                <h1 className="text-sm font-semibold text-gray-700 dark:text-gray-200 text-left">{user.name}</h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
               </div>
             </button>

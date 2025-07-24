@@ -59,3 +59,7 @@ Route::post('/register', function(Request $request) {
 
     return response()->json(['message' => 'Registratie gelukt!'], 201);
 });
+
+Route::get('/user/{slug}', function(string $slug){
+    return User::where('name', $slug)->firstOrFail()->load('profile');
+});

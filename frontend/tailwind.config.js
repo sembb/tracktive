@@ -6,7 +6,11 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        slygray: '#1a1a1e',
+      },
+    },
   },
   plugins: [require('daisyui')],
   daisyui: {
