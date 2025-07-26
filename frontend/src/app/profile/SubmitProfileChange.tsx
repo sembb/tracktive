@@ -1,6 +1,7 @@
 'use client';
 
 import React, {RefObject} from 'react'
+import { useCsrfFetch } from '../../../lib/hooks/useCsrfFetch';
 
 type Props = {
   formRef: RefObject<HTMLFormElement>;
@@ -9,6 +10,8 @@ type Props = {
 export default function SubmitProfileChange({ formRef }: Props) {
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
     console.log('API URL:', apiUrl); // Debugging output
+
+    const { csrfFetch, loading } = useCsrfFetch();
 
     const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -19,15 +22,8 @@ export default function SubmitProfileChange({ formRef }: Props) {
         }
 
         const formData = new FormData(form);
-
-        const res1 = await fetch(`${apiUrl}/sanctum/csrf-cookie`, {
-		    credentials: "include",
-	    });
-      console.log(res1);
-        for (const [key, value] of formData.entries()) {
-  console.log(`${key}:`, value);
-}
-        const res = await fetch(`${apiUrl}/api/profiles`, {
+        
+        const res = await csrfFetch(`${apiUrl}/api/profiles`, {
             method: "POST",
             credentials: "include", // belangrijk voor cookies
             body: formData,

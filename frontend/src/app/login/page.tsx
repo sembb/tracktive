@@ -5,6 +5,7 @@ import { useAuth } from "../../../lib/stores/user";
 import Image from 'next/image';
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
+import { useCsrfFetch } from '../../../lib/hooks/useCsrfFetch';
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { csrfFetch, loading } = useCsrfFetch();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -19,10 +21,7 @@ export default function Login() {
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
     console.log('API URL:', apiUrl); // Debugging output
 
-	const res1 = await fetch(`${apiUrl}/sanctum/csrf-cookie`, {
-		credentials: "include",
-	});
-    const res = await fetch(`${apiUrl}/api/login`, {
+    const res = await csrfFetch(`${apiUrl}/api/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include", // belangrijk voor cookies
@@ -43,7 +42,7 @@ export default function Login() {
 
   return (
 
-    <div className="flex h-auto min-h-screen items-center justify-center overflow-x-hidden py-10">
+    <div className="flex h-auto min-h-screen items-center justify-center overflow-x-hidden">
 		<div className="relative flex items-center justify-center px-4 sm:px-6 lg:px-8">
 			<div className="absolute">
 				<svg
