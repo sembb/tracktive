@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import flatpickr from 'flatpickr';
 import SubmitProfileChange from './SubmitProfileChange';
 
 export default function JSValidationForm() {
   const formRef = useRef<HTMLFormElement>(null);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -35,6 +36,16 @@ export default function JSValidationForm() {
         );
       });
     }
+    async function fetchData() {
+      const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
+      const res = await fetch(`${apiUrl}/api/user`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const json = await res.json();
+      setData(json);
+    }
+    fetchData();
   }, []);
 
   return (
