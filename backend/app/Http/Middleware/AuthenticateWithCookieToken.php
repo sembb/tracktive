@@ -12,9 +12,6 @@ class AuthenticateWithCookieToken
     {
         $token = $request->cookie('auth_token');
 
-        \Log::info('Cookie header:', [$request->header('Cookie')]);
-\Log::info('Parsed cookies:', $request->cookies->all());
-
         if ($token) {
             $accessToken = PersonalAccessToken::findToken($token);
 

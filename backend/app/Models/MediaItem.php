@@ -3,21 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Http\Models\User;
 
-class UserProfile extends Model
+class MediaItem extends Model
 {
-
+    //
     public $incrementing = false;        // Geen auto-increment
     protected $keyType = 'string';       // UUID als string
-    
-    protected $fillable = [
-        'avatar_url',
-        'birth_date',
-        'country',
-        'gender',
-        'bio',
-    ];
 
     protected static function boot()
     {
@@ -28,10 +19,5 @@ class UserProfile extends Model
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
         });
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 }

@@ -8,10 +8,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('user_profiles', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')
-                  ->constrained()
-                  ->onDelete('cascade'); // Delete profile if user is deleted
+            $table->uuid('id')->primary(); // Gebruik UUID als primary key
+
+            $table->uuid('user_id');
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
 
             $table->string('avatar_url')->nullable();     // Profile picture
             $table->date('birth_date')->nullable();       // Date of birth

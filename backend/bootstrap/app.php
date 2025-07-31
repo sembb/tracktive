@@ -22,7 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->group('api', [
+        $middleware->group('api.stateless', [
+            'throttle:api',
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
+
+        $middleware->group('api.stateful', [
             \App\Http\Middleware\LogQueuedCookies::class,
             EnsureFrontendRequestsAreStateful::class,
             EncryptCookies::class,
