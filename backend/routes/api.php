@@ -31,6 +31,7 @@ Route::post('/login', function(Request $request) {
 });
 
 Route::middleware([AuthenticateWithCookieToken::class])->get('/user', function(Request $request) {
+    \Log::info('Session cookie name:', [config('session.cookie')]);
     return $request->user()->load('profile');
 });
 

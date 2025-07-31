@@ -8,10 +8,23 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
         next: { revalidate: 60 }, // ISR: regenerate page every 60 seconds
     });
 
-    if (!res.ok) {
-        // If user not found, show 404
-        notFound();
+if (!res.ok) {
+  let errorDetails = '';
+  try {
+    const contentType = res.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const json = await res.json();
+      errorDetails = JSON.stringify(json, null, 2); // Pretty-printed JSON
+    } else {
+      errorDetails = await res.text(); // Fallback to plain text
     }
+  } catch (e) {
+    errorDetails = 'Could not parse error response';
+  }
+
+  console.error(`Fetch failed (${res.status} ${res.statusText}):\n${errorDetails}`);
+  notFound(); // or throw new Error(errorDetails)
+}
     const profile = await res.json();
     console.log(profile);
     return(

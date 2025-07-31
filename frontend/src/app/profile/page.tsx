@@ -7,10 +7,11 @@ import SubmitProfileChange from './SubmitProfileChange';
 export default function JSValidationForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [data, setData] = useState(null);
+  const fpRef = useRef<any>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      flatpickr('#birth_date', {
+      fpRef.current = flatpickr('#birth_date', {
         allowInput: true,
         monthSelectorType: 'static',
       });
@@ -47,6 +48,37 @@ export default function JSValidationForm() {
     }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (!data || !fpRef.current) return;
+
+    const fillField = (id: string, value: string | boolean) => {
+      const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null;
+      if (el) {
+        if (el.type === 'checkbox') {
+          (el as HTMLInputElement).checked = Boolean(value);
+        } else if (el.type === 'radio') {
+          const radio = document.querySelector(`input[name="${el.name}"][value="${value}"]`) as HTMLInputElement;
+          if (radio) radio.checked = true;
+        } else {
+          el.value = String(value);
+        }
+      }
+    };
+
+    fillField('userEmail', data.email);
+    
+    fillField('bio', data.profile?.bio);
+    fillField('country', data.country);
+    fillField('userSwitch', data.subscribe_emails);
+    fillField('userAgre', data.agree_terms);
+    fillField('male', data.gender === 'male');
+    fillField('female', data.gender === 'female');
+
+    if (fpRef.current && fpRef.current.setDate) {
+      fpRef.current.setDate(data.profile?.birth_date, true);
+    }
+  }, [data]);
 
   return (
     <div className="bg-slygray w-full rounded-lg shadow-base-300/20 shadow-sm container mx-auto">
