@@ -100,7 +100,7 @@ Route::middleware('api.stateless')->group(function () {
         $externalRaw = $externalResponse->json()['results'] ?? [];
 
         // 3. Deduplicate using external_id from local and id from external
-        $localExternalIds = $localResults->pluck('external_id')->filter()->toArray();
+        $localExternalIds = $localResults->pluck('id')->filter()->toArray();
 
         $externalResults = collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
             return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
