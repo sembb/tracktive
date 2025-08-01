@@ -7,3 +7,4 @@ npx next dev -H 0.0.0.0 -p 3000
 - Kopieer `.env.example` naar `.env`
 - Vul de juiste waarden in, bijvoorbeeld lokale IP-adressen
 - Run `php artisan key:generate`
+- Run `php artisan queue:work --verbose --tries=1 --timeout=90`

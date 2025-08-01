@@ -1,0 +1,128 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { autocomplete } from '@algolia/autocomplete-js';
+import '@algolia/autocomplete-theme-classic';
+import { useRouter } from "next/navigation";
+
+export default function SearchBox() {
+  const containerRef = useRef(null);
+  const selectedCategory = useRef(null);
+  const router = useRouter();
+
+  function debouncePromise(fn, time) {
+    let timer = undefined;
+
+    return function debounced(...args) {
+      if (timer) clearTimeout(timer);
+      return new Promise((resolve) => {
+        timer = setTimeout(() => resolve(fn(...args)), time);
+      });
+    };
+  }
+
+  const DEBOUNCE_MS = 400;
+  const debounced = debouncePromise((items) => Promise.resolve(items), DEBOUNCE_MS);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
+    let refreshFn = null;
+
+    const search = autocomplete({
+      container: containerRef.current,
+      placeholder: 'Search...',
+      openOnFocus: true,
+      getSources({ query, setQuery, refresh }) {
+        refreshFn = refresh;
+
+        const trimmedQuery = query?.trim() ?? '';
+
+        // Show category selector
+        if (!selectedCategory.current) {
+          return [
+            {
+              sourceId: 'category-select',
+              getItems: () => [
+                { label: '🎬 Movies', value: 'movies' },
+                { label: '🎮 Games', value: 'games' },
+                { label: '🎵 Music', value: 'music' },
+              ],
+              templates: {
+                item({ item }) {
+                  return item.label;
+                },
+              },
+              onSelect({ item }) {
+                selectedCategory.current = item.value;
+                setQuery('');
+                const input = document.querySelector('#autocomplete input');
+                if (input) input.focus();
+                refresh();
+              },
+            },
+          ];
+        }
+
+        // Require at least 2 characters to start searching
+        if (trimmedQuery.length < 2) {
+          return [];
+        }
+
+        return debounced([
+            {
+                sourceId: 'search-results',
+                render: true,
+                getItems: async () => {
+                const res = await fetch(
+                    `${apiUrl}/api/search/${selectedCategory.current}?q=${encodeURIComponent(trimmedQuery)}`
+                );
+                return res.json();
+                },
+                templates: {
+                    header({html}) {
+                        return html`
+                            <div id="search-header" style="padding: 6px; font-size: 13px; color: gray; display: flex; justify-content: space-between; align-items: center;">
+                            <div>Searching in: <strong>${selectedCategory.current}</strong></div>
+                            <button id="clear-category" style="background: none; border: none; color: #888; font-size: 16px; cursor: pointer;">✖</button>
+                            </div>
+                        `;
+                    },
+                    item({ item }) {
+                        return item.title;
+                    },
+                },
+                onSelect({ item }) {
+                const id = item.id;
+                if (!id) return;
+                router.push(`/media/${selectedCategory.current}/${id}`);
+                },
+            },
+        ]);
+      },
+      onStateChange() {
+        // Enable ✖ button to clear selected category
+        setTimeout(() => {
+          const resetBtn = document.getElementById('clear-category');
+          if (resetBtn) {
+            resetBtn.onclick = () => {
+              selectedCategory.current = null;
+              const input = document.querySelector('#autocomplete input');
+              if (input) {
+                input.value = '';
+                input.focus();
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+              if (refreshFn) refreshFn();
+            };
+          }
+        }, 0);
+      },
+    });
+
+    return () => search.destroy();
+  }, []);
+
+  return <div ref={containerRef} id="autocomplete" />;
+}

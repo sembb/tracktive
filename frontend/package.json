@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@algolia/autocomplete-js": "^1.19.2",
+    "@algolia/autocomplete-theme-classic": "^1.19.2",
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
     "daisyui": "^5.0.43",

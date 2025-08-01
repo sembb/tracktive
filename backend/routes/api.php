@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateWithCookieToken;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\MediaController;
 
 Route::middleware('api.stateful')->group(function () {
     Route::middleware([AuthenticateWithCookieToken::class])->get('/user', function(Request $request) {
@@ -70,4 +71,15 @@ Route::middleware('api.stateless')->group(function () {
             true            // httpOnly
         );
     });
+
+    Route::get('/search/{origin}', function(Request $request, $origin) {
+        $token = config('services.tmdb.token');
+        $response = Http::withToken(config('services.tmdb.token'))
+            ->get('https://api.themoviedb.org/3/search/movie', [
+                'query' => $request->query('q')
+            ]);
+        return $response->json()['results'];
+    });
+
+    Route::get('/media/{type}', [MediaController::class, 'show']);
 });

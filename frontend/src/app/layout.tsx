@@ -7,6 +7,7 @@ import ProfileDropdown from './profileDropdown';
 import { fetchUserFromServer } from '../../lib/user';
 import FlyonuiScript from "./components/FlyonuiScript";
 import GetCookieHeaders from "./components/GetCookieHeaders";
+import SearchBox from "./components/ContentSearchBar";
 
 
 const geistSans = Geist({
@@ -50,6 +51,7 @@ export default async function RootLayout({
 								<a href="/login">Discover</a>
 								<a href="/login">Login</a>
 							</nav>
+							<SearchBox/>
 						</div>
 
 						<div className="flex gap-5 items-center">
