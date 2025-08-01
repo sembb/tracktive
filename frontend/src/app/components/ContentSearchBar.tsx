@@ -89,14 +89,18 @@ export default function SearchBox() {
                             </div>
                         `;
                     },
-                    item({ item }) {
-                        return item.title;
+                    item({ item, html }) {
+						if(item.source != 'external'){
+                        	return 	html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">${item.source}</span></div>`;
+						}else{
+							return 	html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`;
+						}
                     },
                 },
                 onSelect({ item }) {
                 const id = item.id;
                 if (!id) return;
-                router.push(`/media/${selectedCategory.current}/${id}`);
+                  	router.push(`/media/${selectedCategory.current}/${id}`);
                 },
             },
         ]);

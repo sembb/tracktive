@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateWithCookieToken;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\MediaController;
+use App\Models\MediaItem;
 
 Route::middleware('api.stateful')->group(function () {
     Route::middleware([AuthenticateWithCookieToken::class])->get('/user', function(Request $request) {
@@ -72,13 +73,54 @@ Route::middleware('api.stateless')->group(function () {
         );
     });
 
-    Route::get('/search/{origin}', function(Request $request, $origin) {
-        $token = config('services.tmdb.token');
-        $response = Http::withToken(config('services.tmdb.token'))
+    Route::get('/search/{origin}', function (Request $request, $origin) {
+        $query = $request->query('q');
+
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        // 1. Get local (cached) results
+        $localResults = MediaItem::where('title', 'like', '%' . $query . '%')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->external_id,
+                    'title' => $item->title,
+                    'source' => 'cached',
+                ];
+            });
+
+        // 2. Fetch external TMDB results
+        $externalResponse = Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/search/movie', [
-                'query' => $request->query('q')
+                'query' => $query
             ]);
-        return $response->json()['results'];
+
+        $externalRaw = $externalResponse->json()['results'] ?? [];
+
+        // 3. Deduplicate using external_id from local and id from external
+        $localExternalIds = $localResults->pluck('external_id')->filter()->toArray();
+
+        $externalResults = collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
+            return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
+        })->map(function ($item) {
+            return [
+                'id' => $item['id'],
+                'title' => $item['title'] ?? 'Untitled',
+                'source' => 'external',
+            ];
+        });
+
+        // 4. Merge results (cached first)
+        $combined = $localResults->concat($externalResults)->values();
+
+        // 5. Log output safely
+        Log::debug('Local results:', ['local' => $localResults->toArray()]);
+        Log::debug('External results:', ['external' => $externalResults->toArray()]);
+        Log::debug('Combined results:', ['combined' => $combined->toArray()]);
+
+        return response()->json($combined);
     });
 
     Route::get('/media/{type}', [MediaController::class, 'show']);
