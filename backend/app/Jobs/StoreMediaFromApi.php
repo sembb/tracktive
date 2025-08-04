@@ -33,6 +33,7 @@ class StoreMediaFromApi implements ShouldQueue
     {
         try {
             if ($this->type === 'movies') {
+                Log::error("Failed to store media data from API".$this->data['poster_path']);
                 MediaItem::updateOrCreate(
                     ['external_id' => $this->data['id']],
                     [
@@ -41,7 +42,7 @@ class StoreMediaFromApi implements ShouldQueue
                         'type' => 'Movie',
                         'title' => $this->data['title'] ?? 'Untitled',
                         'description' => '',
-                        'image_url' => '',
+                        'image_url' => $this->data['poster_path'],
                         'release_date' => $this->data['release_date'],
                         'metadata_json' => json_encode(new \stdClass()),
                         'last_synced_at' => now(),

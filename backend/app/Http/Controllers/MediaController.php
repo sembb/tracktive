@@ -37,32 +37,7 @@ class MediaController extends Controller
 
         // Return external data immediately
         response()->json($externalData)->send();
-
-
-        // $externalId = $externalData['id'] ?? null;
-        // if (!$externalId) {
-        //     throw new \Exception('Missing external ID');
-        // }
-        // if ($type === 'movies') {
-        //     MediaItem::updateOrCreate(
-        //         ['external_id' => $externalData['id']],
-        //         [
-        //             'external_id' => $externalData['id'],
-        //             'external_source' => 'TMDB',
-        //             'type' => 'Movie',
-        //             'title' => $externalData['title'] ?? 'Untitled',
-        //             'description' => '',
-        //             'image_url' => '',
-        //             'release_date' => $externalData['release_date'],
-        //             'metadata_json' => json_encode(new \stdClass()),
-        //             'last_synced_at' => now(),
-        //         ]
-        //     );
-        // }
-
-        // Only dispatch job if:
-        // - model doesn't exist OR
-        // - last update is older than 3 days
+        
         if (!$model || $model->updated_at->lt(now()->subDays(3))) {
             StoreMediaFromApi::dispatch($type, $externalData);
         }

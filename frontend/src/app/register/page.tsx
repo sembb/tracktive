@@ -20,9 +20,12 @@ export default function RegisterPage() {
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
     const res = await fetch(`${apiUrl}/api/register`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      credentials: "omit",  // <- heel belangrijk!
       body: JSON.stringify(form),
-      credentials: "include",
     });
 
     if (res.ok) {

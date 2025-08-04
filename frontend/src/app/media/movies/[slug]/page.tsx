@@ -1,6 +1,12 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
+interface Movie {
+  title: string;
+  release_date: string;
+  image_url: string;
+}
+
 async function getMovie(id: string) {
   const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
 
@@ -31,11 +37,26 @@ async function getMovie(id: string) {
 export default async function Page({params, }: { params: Promise<{ slug: string }> }) {
     const {slug} = await params;
     const movie = await getMovie(slug);
+
+	const normalizedMovie = {
+		title: movie.title,
+		release_date: movie.release_date,
+		image_url: movie.poster_path || movie.image_url, // eerst API, anders DB
+	}
+
     return(
         <div className="container mx-auto">
             <div>
-                <h1>{movie.title}</h1>
-                <span>{movie.release_date}</span>
+				<Image
+					src={`https://image.tmdb.org/t/p/w500/${normalizedMovie.image_url}`}
+					width={500}
+					height={500}
+					alt="Movie poster"
+				/>
+            </div>
+            <div>
+                <h1>{normalizedMovie.title}</h1>
+                <span>{normalizedMovie.release_date}</span>
             </div>
         </div>
     )
