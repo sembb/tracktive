@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Models\Person;
 
 class MediaItem extends Model
 {
@@ -33,5 +34,12 @@ class MediaItem extends Model
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
         });
+    }
+
+    public function people()
+    {
+        return $this->belongsToMany(Person::class, 'media_item_person', 'media_item_id', 'person_id')
+            ->withPivot('role', 'character_name') // optional: if you're storing extra data
+            ->withTimestamps();
     }
 }

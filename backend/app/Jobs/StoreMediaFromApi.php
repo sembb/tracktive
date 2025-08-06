@@ -6,24 +6,30 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use App\Models\MediaItem;
-use Exception;
+use App\Models\Person;
+use Throwable;
 
 class StoreMediaFromApi implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, SerializesModels;
 
     protected string $type;
-    protected array $data;
+    protected array $mediaitem;
+    protected Collection $crew;
+    protected Collection $cast;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(string $type, array $data)
+    public function __construct(string $type, array $mediaitem, Collection $crew, Collection $cast)
     {
         $this->type = $type;
-        $this->data = $data;
+        $this->mediaitem = $mediaitem;
+        $this->crew = $crew;
+        $this->cast = $cast;
     }
 
     /**
@@ -33,27 +39,45 @@ class StoreMediaFromApi implements ShouldQueue
     {
         try {
             if ($this->type === 'movies') {
-                Log::error("Failed to store media data from API".$this->data['poster_path']);
-                MediaItem::updateOrCreate(
-                    ['external_id' => $this->data['id']],
+                Log::error("Failed to store media data from API".$this->mediaitem['poster_path']);
+                $newitem = MediaItem::updateOrCreate(
+                    ['external_id' => $this->mediaitem['id']],
                     [
-                        'external_id' => $this->data['id'],
+                        'external_id' => $this->mediaitem['id'],
                         'external_source' => 'TMDB',
                         'type' => 'Movie',
-                        'title' => $this->data['title'] ?? 'Untitled',
+                        'title' => $this->mediaitem['title'] ?? 'Untitled',
                         'description' => '',
-                        'image_url' => $this->data['poster_path'],
-                        'release_date' => $this->data['release_date'],
+                        'image_url' => $this->mediaitem['poster_path'],
+                        'release_date' => $this->mediaitem['release_date'],
                         'metadata_json' => json_encode(new \stdClass()),
                         'last_synced_at' => now(),
                     ]
                 );
+                foreach($this->cast as $castmember){
+                    Log::error("Trying to store ".$castmember['original_name']);
+                    $person = Person::updateOrCreate(
+                        ['name' => $castmember['original_name'], 'type' => 'actor'],
+                        [
+                        'name' => $castmember['original_name'],
+                        'type' => 'actor',
+                        ]
+                    );
+
+                    $newitem->people()->syncWithoutDetaching([
+                        $person->id => [
+                            'role' => 'actor',
+                            'character_name' => $castmember['character'],
+                        ]
+                    ]);
+                }
+                
             } elseif ($this->type === 'tv') {
                 MediaItem::updateOrCreate(
-                    ['id' => $this->data['id']],
+                    ['id' => $this->mediaitem['id']],
                     [
-                        'name' => $this->data['name'] ?? 'Untitled',
-                        'overview' => $this->data['overview'] ?? '',
+                        'name' => $this->mediaitem['name'] ?? 'Untitled',
+                        'overview' => $this->mediaitem['overview'] ?? '',
                         // Add more fields safely
                     ]
                 );
@@ -64,7 +88,7 @@ class StoreMediaFromApi implements ShouldQueue
             Log::error("Failed to store media data from API", [
                 'type' => $this->type,
                 'error' => $e->getMessage(),
-                'data' => $this->data,
+                'data' => $this->mediaitem,
             ]);
 
             throw $e; // Optional: Let Laravel mark the job as failed
@@ -74,12 +98,12 @@ class StoreMediaFromApi implements ShouldQueue
     /**
      * Handle a job failure.
      */
-    public function failed(Exception $exception): void
+    public function failed(Throwable $exception): void
     {
         Log::alert("StoreMediaFromApi job failed", [
             'type' => $this->type,
             'message' => $exception->getMessage(),
-            'data' => $this->data['id'] ?? null,
+            'data' => $this->mediaitem['id'] ?? null,
         ]);
 
         // Optional: trigger alert/notification

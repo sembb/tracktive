@@ -42,22 +42,28 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 		title: movie.title,
 		release_date: movie.release_date,
 		image_url: movie.poster_path || movie.image_url, // eerst API, anders DB
+		cast: movie.people,
 	}
 
     return(
         <div className="container mx-auto">
-            <div>
-				<Image
-					src={`https://image.tmdb.org/t/p/w500/${normalizedMovie.image_url}`}
-					width={500}
-					height={500}
-					alt="Movie poster"
-				/>
-            </div>
-            <div>
-                <h1>{normalizedMovie.title}</h1>
-                <span>{normalizedMovie.release_date}</span>
-            </div>
+			<div className='grid grid-cols-[500px_auto] gap-12'>
+				<div>
+					<Image
+						src={`https://image.tmdb.org/t/p/w500/${normalizedMovie.image_url}`}
+						width={500}
+						height={500}
+						alt="Movie poster"
+					/>
+				</div>
+				<div>
+					<h1>{normalizedMovie.title}</h1>
+					<span>{normalizedMovie.release_date}</span>
+					<div className='flex gap-1 flex-wrap'>{normalizedMovie.cast.map(castmember => (
+						<span className='inline-flex items-center rounded-md bg-pink-50 px-2 py-1 text-xs font-medium text-pink-700 ring-1 ring-pink-700/10 ring-inset'>{castmember.name} - {castmember.pivot.character_name}</span>
+					))}</div>
+				</div>
+			</div>
         </div>
     )
 }
