@@ -30,6 +30,7 @@ export default function Login() {
 
     if (res.ok) {
       const data = await res.json();
+	  localStorage.setItem('auth_token', data.token);
 	  console.log('Setting user:', data.user);
       useAuth.getState().setUser(data.user)
 	  console.log('User set');

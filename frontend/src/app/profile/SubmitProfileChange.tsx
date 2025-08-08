@@ -23,10 +23,12 @@ export default function SubmitProfileChange({ formRef }: Props) {
 
         const formData = new FormData(form);
         
-        const res = await csrfFetch(`${apiUrl}/api/profiles`, {
+        const res = await fetch(`${apiUrl}/api/profiles`, {
             method: "POST",
-            credentials: "include", // belangrijk voor cookies
             body: formData,
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+            },
         });
 
         if (res.ok) {

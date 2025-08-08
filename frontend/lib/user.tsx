@@ -9,7 +9,7 @@ export async function fetchUserFromServer(cookieHeader?: string) {
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-                ...(cookieHeader ? { cookieHeader } : {}),
+                Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
             },
             });
         

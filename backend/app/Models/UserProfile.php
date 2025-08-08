@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Models\User;
+use Illuminate\Support\Str;
 
 class UserProfile extends Model
 {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { DM_Sans, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import Image from 'next/image'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
@@ -10,14 +10,15 @@ import GetCookieHeaders from "./components/GetCookieHeaders";
 import SearchBox from "./components/ContentSearchBar";
 
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const DMSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const BebasNeue = Bebas_Neue({
+	variable: "--font-bebas-neue",
+	subsets: ["latin"],
+	weight: "400"
 });
 
 export const metadata: Metadata = {
