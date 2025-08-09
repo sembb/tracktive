@@ -10,22 +10,26 @@ interface Movie {
 
 async function getMovie(id: string) {
   const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
+  console.log('API URL:', apiUrl);
+
+  const url = `${apiUrl}/api/media/movies?id=${id}`;
+  console.log('Fetching URL:', url);
 
   try {
-    const res = await fetch(`${apiUrl}/api/media/movies?id=${id}`, {
-      cache: 'no-store',
-    });
+    // Simple test fetch
+    await fetch('https://jsonplaceholder.typicode.com/todos/1');
+  } catch (testError) {
+    console.error('Fetch test failed:', testError);
+  }
 
-    // Log the raw response status and headers
+  try {
+    const res = await fetch(url, { cache: 'no-store' });
     console.log('Response status:', res.status);
-    console.log('Response headers:', [...res.headers.entries()]);
-
     if (!res.ok) {
-      const errorText = await res.text(); // get text for more info
-      console.error('Failed to fetch movie:', errorText);
+      const errorText = await res.text();
+      console.error('Error response body:', errorText);
       throw new Error(`Failed to fetch movie: ${res.status} ${res.statusText}`);
     }
-
     const data = await res.json();
     console.log('Movie data:', data);
     return data;
@@ -34,6 +38,7 @@ async function getMovie(id: string) {
     throw error;
   }
 }
+
 
 export default async function Page({params, }: { params: Promise<{ slug: string }> }) {
     const {slug} = await params;
