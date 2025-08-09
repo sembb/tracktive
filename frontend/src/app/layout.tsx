@@ -35,7 +35,7 @@ export default async function RootLayout({
 	const cookieHeader = await GetCookieHeaders();
 	return (
 		<html lang="en">
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+			<body className={`${DMSans.variable} ${BebasNeue.variable} antialiased font-dm`}>
 				<header>
 					<div className="container mx-auto flex items-center justify-between">
 						<div className="flex items-center gap-10">

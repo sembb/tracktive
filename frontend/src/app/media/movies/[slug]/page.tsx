@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import CastList from './CastList';
 
 interface Movie {
   title: string;
@@ -57,11 +58,9 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 					/>
 				</div>
 				<div>
-					<h1>{normalizedMovie.title}</h1>
+					<h1 className='font-bebas text-6xl'>{normalizedMovie.title}</h1>
 					<span>{normalizedMovie.release_date}</span>
-					<div className='flex gap-1 flex-wrap'>{normalizedMovie.cast.map(castmember => (
-						<span className='inline-flex items-center rounded-md bg-pink-50 px-2 py-1 text-xs font-medium text-pink-700 ring-1 ring-pink-700/10 ring-inset'>{castmember.name} - {castmember.pivot.character_name}</span>
-					))}</div>
+					<CastList cast={normalizedMovie.cast} />
 				</div>
 			</div>
         </div>
