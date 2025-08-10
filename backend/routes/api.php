@@ -79,27 +79,78 @@ Route::get('/search/{origin}', function (Request $request, $origin) {
                 'source' => 'cached',
             ];
         });
-
-    // 2. Fetch external TMDB results
-    $externalResponse = Http::withToken(config('services.tmdb.token'))
-        ->get('https://api.themoviedb.org/3/search/movie', [
-            'query' => $query
-        ]);
-
-    $externalRaw = $externalResponse->json()['results'] ?? [];
-
-    // 3. Deduplicate using external_id from local and id from external
     $localExternalIds = $localResults->pluck('id')->filter()->toArray();
 
-    $externalResults = collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
-        return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
-    })->map(function ($item) {
-        return [
-            'id' => $item['id'],
-            'title' => $item['title'] ?? 'Untitled',
-            'source' => 'external',
+    if($origin === 'movies') {
+
+        // 2. Fetch external TMDB results
+        $externalResponse = Http::withToken(config('services.tmdb.token'))
+            ->get('https://api.themoviedb.org/3/search/movie', [
+                'query' => $query
+            ]);
+
+        $externalRaw = $externalResponse->json()['results'] ?? [];
+
+        $externalResults = collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
+            return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
+        })->map(function ($item) {
+            return [
+                'id' => $item['id'],
+                'title' => $item['title'] ?? 'Untitled',
+                'source' => 'external',
+            ];
+        });
+
+    }else if($origin === 'tv') {
+
+    }else if($origin === 'anime') {
+        $gqlquery = '
+            query ($search: String, $page: Int) {
+                Page(page: $page, perPage: 25) {
+                    media(search: $search, type: ANIME) {
+                        id
+                        title {
+                            romaji
+                            english
+                            native
+                        }
+                        description
+                        episodes
+                        coverImage {
+                            large
+                        }
+                        genres
+                        status
+                    }
+                }
+            }
+        ';
+
+        $variables = [
+            'search' => $query,
         ];
-    });
+
+        $externalResponse = Http::post('https://graphql.anilist.co', [
+            'query' => $gqlquery,
+            'variables' => $variables,
+        ]);
+
+        if ($externalResponse->successful()) {
+            $externalRaw = $externalResponse->json()['data']['Page']['media'] ?? [];
+
+            $externalResults = collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
+                return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
+            })->map(function ($item) {
+                return [
+                    'id' => $item['id'],
+                    'title' => $item['title']['english'] ?? $item['title']['romaji'] ?? $item['title']['native'] ?? 'Untitled',
+                    'source' => 'external',
+                ];
+            });
+        } else {
+            return response()->json(['error' => 'Failed to fetch data'], 500);
+        }
+    }
 
     // 4. Merge results (cached first)
     $combined = $localResults->concat($externalResults)->values();

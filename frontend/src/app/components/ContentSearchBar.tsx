@@ -46,6 +46,7 @@ export default function SearchBox() {
               sourceId: 'category-select',
               getItems: () => [
                 { label: '🎬 Movies', value: 'movies' },
+				{ label: '🎬 Anime', value: 'anime' },
                 { label: '🎮 Games', value: 'games' },
                 { label: '🎵 Music', value: 'music' },
               ],

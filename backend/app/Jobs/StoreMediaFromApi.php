@@ -39,7 +39,9 @@ class StoreMediaFromApi implements ShouldQueue
     {
         try {
             if ($this->type === 'movies') {
-                Log::error("Failed to store media data from API".$this->mediaitem['poster_path']);
+                $metadata = new \stdClass();
+                $metadata->tagline = $this->mediaitem['tagline'] ?? '';
+                $metadata->runtime = $this->mediaitem['runtime'] ?? 0;
                 $newitem = MediaItem::updateOrCreate(
                     ['external_id' => $this->mediaitem['id']],
                     [
@@ -47,10 +49,10 @@ class StoreMediaFromApi implements ShouldQueue
                         'external_source' => 'TMDB',
                         'type' => 'Movie',
                         'title' => $this->mediaitem['title'] ?? 'Untitled',
-                        'description' => '',
+                        'description' => $this->mediaitem['overview'] ?? '',
                         'image_url' => $this->mediaitem['poster_path'],
                         'release_date' => $this->mediaitem['release_date'],
-                        'metadata_json' => json_encode(new \stdClass()),
+                        'metadata_json' => json_encode($metadata),
                         'last_synced_at' => now(),
                     ]
                 );

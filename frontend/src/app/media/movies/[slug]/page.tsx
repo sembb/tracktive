@@ -16,13 +16,6 @@ async function getMovie(id: string) {
   console.log('Fetching URL:', url);
 
   try {
-    // Simple test fetch
-    await fetch('https://jsonplaceholder.typicode.com/todos/1');
-  } catch (testError) {
-    console.error('Fetch test failed:', testError);
-  }
-
-  try {
     const res = await fetch(url, { cache: 'no-store' });
     console.log('Response status:', res.status);
     if (!res.ok) {
@@ -44,11 +37,20 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
     const {slug} = await params;
     const movie = await getMovie(slug);
 
+	console.log('Normalized movie data:', movie);
+
+	const metadata = typeof movie.metadata_json === 'string'
+		? JSON.parse(movie.metadata_json)
+		: movie.metadata_json || '';
+
 	const normalizedMovie = {
 		title: movie.title,
 		release_date: movie.release_date,
 		image_url: movie.poster_path || movie.image_url, // eerst API, anders DB
 		cast: movie.people,
+		description: movie.description || movie.overview || '', // fallback to overview if description is not available
+		tagline: metadata.tagline || movie.tagline || '',
+		runtime: metadata.runtime || movie.runtime || 0, // fallback to movie runtime if metadata is not available
 	}
 
     return(
@@ -64,7 +66,9 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 				</div>
 				<div>
 					<h1 className='font-bebas text-6xl'>{normalizedMovie.title}</h1>
+          			<span className='block italic mb-4'>{normalizedMovie.tagline}</span>
 					<span>{normalizedMovie.release_date}</span>
+          			<div className='my-4'>{normalizedMovie.description}</div>
 					<CastList cast={normalizedMovie.cast} />
 				</div>
 			</div>
