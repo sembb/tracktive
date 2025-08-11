@@ -38,7 +38,7 @@ class StoreMediaFromApi implements ShouldQueue
     public function handle(): void
     {
         try {
-            if ($this->type === 'movies') {
+            if ($this->type == 'movie') {
                 $metadata = new \stdClass();
                 $metadata->tagline = $this->mediaitem['tagline'] ?? '';
                 $metadata->runtime = $this->mediaitem['runtime'] ?? 0;
@@ -74,7 +74,7 @@ class StoreMediaFromApi implements ShouldQueue
                     ]);
                 }
                 
-            } elseif ($this->type === 'tv') {
+            } elseif ($this->type == 'tv') {
                 MediaItem::updateOrCreate(
                     ['id' => $this->mediaitem['id']],
                     [
