@@ -38,31 +38,33 @@ class StoreMediaFromApi implements ShouldQueue
     public function handle(): void
     {
         try {
-            if ($this->type == 'movie') {
-                $metadata = new \stdClass();
-                $metadata->tagline = $this->mediaitem['tagline'] ?? '';
-                $metadata->runtime = $this->mediaitem['runtime'] ?? 0;
-                $newitem = MediaItem::updateOrCreate(
-                    ['external_id' => $this->mediaitem['id']],
-                    [
-                        'external_id' => $this->mediaitem['id'],
-                        'external_source' => 'TMDB',
-                        'type' => 'Movie',
-                        'title' => $this->mediaitem['title'] ?? 'Untitled',
-                        'description' => $this->mediaitem['overview'] ?? '',
-                        'image_url' => $this->mediaitem['poster_path'],
-                        'release_date' => $this->mediaitem['release_date'],
-                        'metadata_json' => json_encode($metadata),
-                        'last_synced_at' => now(),
-                    ]
-                );
+            $metadata = new \stdClass();
+            $metadata->tagline = $this->mediaitem['tagline'] ?? '';
+            $metadata->runtime = $this->mediaitem['runtime'] ?? 0;
+            $newitem = MediaItem::updateOrCreate(
+                ['external_id' => $this->mediaitem['id']],
+                [
+                    'external_id' => $this->mediaitem['id'],
+                    'external_source' => 'TMDB',
+                    'type' => ucfirst($this->type),
+                    'title' => $this->mediaitem['title'] ?? 'Untitled',
+                    'description' => $this->mediaitem['overview'] ?? '',
+                    'image_url' => $this->mediaitem['poster_path'],
+                    'release_date' => $this->mediaitem['release_date'],
+                    'metadata_json' => json_encode($metadata),
+                    'last_synced_at' => now(),
+                ]
+            );
+
+            if($this->cast->isnotempty()){
                 foreach($this->cast as $castmember){
-                    Log::error("Trying to store ".$castmember['original_name']);
+                    Log::error("Trying to store ".$castmember['original_name'] . $castmember['actor_image_url']);
                     $person = Person::updateOrCreate(
                         ['name' => $castmember['original_name'], 'type' => 'actor'],
                         [
                         'name' => $castmember['original_name'],
                         'type' => 'actor',
+                        'image_url' => $castmember['actor_image_url'] ?? null,
                         ]
                     );
 
@@ -70,21 +72,10 @@ class StoreMediaFromApi implements ShouldQueue
                         $person->id => [
                             'role' => 'actor',
                             'character_name' => $castmember['character'],
+                            'image_url' => $castmember['character_image_url'] ?? null,
                         ]
                     ]);
                 }
-                
-            } elseif ($this->type == 'tv') {
-                MediaItem::updateOrCreate(
-                    ['id' => $this->mediaitem['id']],
-                    [
-                        'name' => $this->mediaitem['name'] ?? 'Untitled',
-                        'overview' => $this->mediaitem['overview'] ?? '',
-                        // Add more fields safely
-                    ]
-                );
-            } else {
-                throw new Exception("Unsupported media type: {$this->type}");
             }
         } catch (Exception $e) {
             Log::error("Failed to store media data from API", [

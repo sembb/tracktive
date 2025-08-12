@@ -1,5 +1,8 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import CastList from './CastList';
+import DOMPurify from 'dompurify';
+import SafeDescription from '@/app/components/SafeDescription';
 
 interface Anime {
   title: string;
@@ -11,15 +14,8 @@ async function getAnime(id: string) {
   const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
   console.log('API URL:', apiUrl);
 
-  const url = `${apiUrl}/api/media/animes?id=${id}`;
+  const url = `${apiUrl}/api/media/anime?id=${id}`;
   console.log('Fetching URL:', url);
-
-  try {
-    // Simple test fetch
-    await fetch('https://jsonplaceholder.typicode.com/todos/1');
-  } catch (testError) {
-    console.error('Fetch test failed:', testError);
-  }
 
   try {
     const res = await fetch(url, { cache: 'no-store' });
@@ -50,11 +46,14 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 		: anime.metadata_json || '';
 
 	const normalizedAnime = {
-		title: anime.title.english || anime.title.romaji || anime.title.native || 'Untitled',
+		title: anime.title || 'Untitled',
 		release_date: anime.release_date,
         image_url: anime.poster_path || anime.image_url, // first API, otherwise DB
         description: anime.description || anime.overview || '', // fallback to overview if description is not available
+		cast:  anime.people || [],
 	}
+
+	console.log('Normalized anime:', normalizedAnime.cast);
 
     return(
         <div className="container mx-auto">
@@ -71,7 +70,10 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 					<h1 className='font-bebas text-6xl'>{normalizedAnime.title}</h1>
           			<span className='block italic mb-4'>{normalizedAnime.tagline}</span>
 					<span>{normalizedAnime.release_date}</span>
-          			<div className='my-4'>{normalizedAnime.description}</div>
+          			<div className="my-4">
+						<SafeDescription html={normalizedAnime.description} />
+					</div>
+					<CastList cast={normalizedAnime.cast} />
 				</div>
 			</div>
         </div>

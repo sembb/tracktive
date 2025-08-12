@@ -39,7 +39,7 @@ class MediaItem extends Model
     public function people()
     {
         return $this->belongsToMany(Person::class, 'media_item_person', 'media_item_id', 'person_id')
-            ->withPivot('role', 'character_name') // optional: if you're storing extra data
+            ->withPivot('role', 'character_name', 'image_url') // optional: if you're storing extra data
             ->withTimestamps();
     }
 }

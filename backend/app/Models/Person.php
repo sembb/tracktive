@@ -12,7 +12,7 @@ class Person extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     
-    protected $fillable = ['name', 'type'];
+    protected $fillable = ['name', 'type', 'image_url'];
 
     public function mediaItems()
     {
