@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\MediaController;
 use App\Models\MediaItem;
+use App\Http\Controllers\SearchController;
 
 Route::middleware('auth:sanctum')->get('/user', function(Request $request) {
     \Log::info('Session cookie name:', [config('session.cookie')]);
@@ -62,105 +63,6 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
-Route::get('/search/{origin}', function (Request $request, $origin) {
-    $query = $request->query('q');
-
-    if (strlen($query) < 2) {
-        return response()->json([]);
-    }
-
-    // 1. Get local (cached) results
-    $localResults = MediaItem::where('title', 'like', '%' . $query . '%')
-        ->get()
-        ->map(function ($item) {
-            return [
-                'id' => $item->external_id,
-                'title' => $item->title,
-                'source' => 'cached',
-            ];
-        });
-    $localExternalIds = $localResults->pluck('id')->filter()->toArray();
-
-    if($origin === 'movies') {
-
-        // 2. Fetch external TMDB results
-        $externalResponse = Http::withToken(config('services.tmdb.token'))
-            ->get('https://api.themoviedb.org/3/search/movie', [
-                'query' => $query
-            ]);
-
-        $externalRaw = $externalResponse->json()['results'] ?? [];
-
-        $externalResults = collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
-            return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
-        })->map(function ($item) {
-            return [
-                'id' => $item['id'],
-                'title' => $item['title'] ?? 'Untitled',
-                'source' => 'external',
-            ];
-        });
-
-    }else if($origin === 'tv') {
-
-    }else if($origin === 'anime') {
-        $gqlquery = '
-            query ($search: String, $page: Int) {
-                Page(page: $page, perPage: 25) {
-                    media(search: $search, type: ANIME) {
-                        id
-                        title {
-                            romaji
-                            english
-                            native
-                        }
-                        description
-                        episodes
-                        coverImage {
-                            large
-                        }
-                        genres
-                        status
-                    }
-                }
-            }
-        ';
-
-        $variables = [
-            'search' => $query,
-        ];
-
-        $externalResponse = Http::post('https://graphql.anilist.co', [
-            'query' => $gqlquery,
-            'variables' => $variables,
-        ]);
-
-        if ($externalResponse->successful()) {
-            $externalRaw = $externalResponse->json()['data']['Page']['media'] ?? [];
-
-            $externalResults = collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
-                return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
-            })->map(function ($item) {
-                return [
-                    'id' => $item['id'],
-                    'title' => $item['title']['english'] ?? $item['title']['romaji'] ?? $item['title']['native'] ?? 'Untitled',
-                    'source' => 'external',
-                ];
-            });
-        } else {
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
-    // 4. Merge results (cached first)
-    $combined = $localResults->concat($externalResults)->values();
-
-    // 5. Log output safely
-    Log::debug('Local results:', ['local' => $localResults->toArray()]);
-    Log::debug('External results:', ['external' => $externalResults->toArray()]);
-    Log::debug('Combined results:', ['combined' => $combined->toArray()]);
-
-    return response()->json($combined);
-});
+Route::get('/search/{origin}', [SearchController::class, 'search']);
 
 Route::get('/media/{type}', [MediaController::class, 'show']);

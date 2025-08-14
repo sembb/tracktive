@@ -125,4 +125,54 @@ class AnilistDetailFetchService implements MediaDetailFetcherInterface
             'cast' => $cast,
         ];
     }
+
+    public function searchAnime(string $query, array $localExternalIds): \Illuminate\Support\Collection
+    {
+        $gqlquery = '
+                query ($search: String, $page: Int) {
+                    Page(page: $page, perPage: 25) {
+                        media(search: $search, type: ANIME) {
+                            id
+                            title {
+                                romaji
+                                english
+                                native
+                            }
+                            description
+                            episodes
+                            coverImage {
+                                large
+                            }
+                            genres
+                            status
+                        }
+                    }
+                }
+            ';
+
+            $variables = [
+                'search' => $query,
+            ];
+
+            $externalResponse = Http::post('https://graphql.anilist.co', [
+                'query' => $gqlquery,
+                'variables' => $variables,
+            ]);
+
+            if ($externalResponse->successful()) {
+                $externalRaw = $externalResponse->json()['data']['Page']['media'] ?? [];
+
+                return collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
+                    return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
+                })->map(function ($item) {
+                    return [
+                        'id' => $item['id'],
+                        'title' => $item['title']['english'] ?? $item['title']['romaji'] ?? $item['title']['native'] ?? 'Untitled',
+                        'source' => 'external',
+                    ];
+                });
+            } else {
+                return response()->json(['error' => 'Failed to fetch data'], 500);
+            }
+    }
 }
