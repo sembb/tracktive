@@ -1,8 +1,7 @@
-export async function fetchUserFromServer(cookieHeader?: string) {
+export async function fetchUserFromServer() {
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
     console.log('Fetching user from:', apiUrl);
-    console.log('Using cookie header:', cookieHeader);
-    if(cookieHeader){
+    if(localStorage.getItem('auth_token')){
         try {
             const res = await fetch(`${apiUrl}/api/user`, {
             method: 'GET',

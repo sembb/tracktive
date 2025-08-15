@@ -71,42 +71,85 @@ export default function SearchBox() {
           return [];
         }
 
-        return debounced([
-            {
-                sourceId: 'search-results',
-                render: true,
-                getItems: async () => {
-                const res = await fetch(
-                    `${apiUrl}/api/search/${selectedCategory.current}?q=${encodeURIComponent(trimmedQuery)}`
-                );
-                return res.json();
-                },
+        if (selectedCategory.current === 'music') {
+            const fetchMusicResults = async () => {
+                const res = await fetch(`${apiUrl}/api/search/music?q=${encodeURIComponent(trimmedQuery)}`);
+                const data = await res.json();
+                return {
+                artists: data.filter(i => i.type === 'artist'),
+                albums:  data.filter(i => i.type === 'album'),
+                tracks:  data.filter(i => i.type === 'track')
+                };
+            };
+
+            return debounced([
+                {
+                sourceId: 'music-artists',
+                getItems: async () => (await fetchMusicResults()).artists,
                 templates: {
-                    header({html}) {
-                        return html`
-                            <div id="search-header" style="padding: 6px; font-size: 13px; color: gray; display: flex; justify-content: space-between; align-items: center;">
-                            <div>Searching in: <strong>${selectedCategory.current}</strong></div>
-                            <button id="clear-category" style="background: none; border: none; color: #888; font-size: 16px; cursor: pointer;">✖</button>
-                            </div>
-                        `;
+                    header({ html }) { return html`<div style="padding: 6px; font-weight: bold;">Artists</div>`; },
+                    item({ item, html }) { return html`<div>${item.title}</div>`; }
+                },
+                onSelect({ item }) { router.push(`/media/music/artist/${item.id}`); }
+                },
+                {
+                sourceId: 'music-albums',
+                getItems: async () => (await fetchMusicResults()).albums,
+                templates: {
+                    header({ html }) { return html`<div style="padding: 6px; font-weight: bold;">Albums</div>`; },
+                    item({ item, html }) { return html`<div>${item.title}</div>`; }
+                },
+                onSelect({ item }) { router.push(`/media/music/album/${item.id}`); }
+                },
+                {
+                sourceId: 'music-tracks',
+                getItems: async () => (await fetchMusicResults()).tracks,
+                templates: {
+                    header({ html }) { return html`<div style="padding: 6px; font-weight: bold;">Tracks</div>`; },
+                    item({ item, html }) { return html`<div>${item.title}</div>`; }
+                },
+                onSelect({ item }) { router.push(`/media/music/track/${item.id}`); }
+                }
+            ]);
+        }else{
+
+            return debounced([
+                {
+                    sourceId: 'search-results',
+                    render: true,
+                    getItems: async () => {
+                    const res = await fetch(
+                        `${apiUrl}/api/search/${selectedCategory.current}?q=${encodeURIComponent(trimmedQuery)}`
+                    );
+                    return res.json();
                     },
-                    item({ item, html }) {
-						if(item.source != 'external'){
-                        	return 	html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">${item.source}</span></div>`;
-						}else{
-							return 	html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`;
-						}
+                    templates: {
+                        header({html}) {
+                            return html`
+                                <div id="search-header" style="padding: 6px; font-size: 13px; color: gray; display: flex; justify-content: space-between; align-items: center;">
+                                <div>Searching in: <strong>${selectedCategory.current}</strong></div>
+                                <button id="clear-category" style="background: none; border: none; color: #888; font-size: 16px; cursor: pointer;">✖</button>
+                                </div>
+                            `;
+                        },
+                        item({ item, html }) {
+                            if(item.source != 'external'){
+                                return 	html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset">${item.source}</span></div>`;
+                            }else{
+                                return 	html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`;
+                            }
+                        },
+                    },
+                    onSelect({ item }) {
+                    const id = item.id;
+                    if (!id) return;
+                        router.push(`/media/${selectedCategory.current}/${id}`);
                     },
                 },
-                onSelect({ item }) {
-                const id = item.id;
-                if (!id) return;
-                  	router.push(`/media/${selectedCategory.current}/${id}`);
-                },
-            },
-        ]);
-      },
-      onStateChange() {
+            ]);
+        }
+    },
+    onStateChange() {
         // Enable ✖ button to clear selected category
         setTimeout(() => {
           const resetBtn = document.getElementById('clear-category');
@@ -123,7 +166,7 @@ export default function SearchBox() {
             };
           }
         }, 0);
-      },
+    },
     });
 
     return () => search.destroy();
