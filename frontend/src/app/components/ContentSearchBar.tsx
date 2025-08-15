@@ -87,8 +87,13 @@ export default function SearchBox() {
                 sourceId: 'music-artists',
                 getItems: async () => (await fetchMusicResults()).artists,
                 templates: {
-                    header({ html }) { return html`<div style="padding: 6px; font-weight: bold;">Artists</div>`; },
-                    item({ item, html }) { return html`<div>${item.title}</div>`; }
+                    header({ html }) { return html`
+                        <div id="search-header" style="padding: 6px; font-size: 13px; color: gray; display: flex; justify-content: space-between; align-items: center;">
+                        <div>Searching in: <strong>${selectedCategory.current}</strong></div>
+                        <button id="clear-category" style="background: none; border: none; color: #888; font-size: 16px; cursor: pointer;">✖</button>
+                        </div>
+                        <div style="padding: 6px; font-weight: bold;">Artists</div>`; },
+                    item({ item, html }) { return html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`; }
                 },
                 onSelect({ item }) { router.push(`/media/music/artist/${item.id}`); }
                 },
@@ -97,7 +102,7 @@ export default function SearchBox() {
                 getItems: async () => (await fetchMusicResults()).albums,
                 templates: {
                     header({ html }) { return html`<div style="padding: 6px; font-weight: bold;">Albums</div>`; },
-                    item({ item, html }) { return html`<div>${item.title}</div>`; }
+                    item({ item, html }) { return html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`; }
                 },
                 onSelect({ item }) { router.push(`/media/music/album/${item.id}`); }
                 },
@@ -106,7 +111,7 @@ export default function SearchBox() {
                 getItems: async () => (await fetchMusicResults()).tracks,
                 templates: {
                     header({ html }) { return html`<div style="padding: 6px; font-weight: bold;">Tracks</div>`; },
-                    item({ item, html }) { return html`<div>${item.title}</div>`; }
+                    item({ item, html }) { return html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`; }
                 },
                 onSelect({ item }) { router.push(`/media/music/track/${item.id}`); }
                 }
@@ -147,6 +152,7 @@ export default function SearchBox() {
                     },
                 },
             ]);
+
         }
     },
     onStateChange() {

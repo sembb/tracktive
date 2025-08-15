@@ -4,5 +4,5 @@ namespace App\Services;
 
 interface MediaDetailFetcherInterface
 {
-    public function fetch(string|int $id): array;
+    public function fetch(string|int $id, string $subtype): array;
 }

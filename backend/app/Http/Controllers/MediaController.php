@@ -6,10 +6,11 @@ use App\Models\MediaItem;
 use App\Jobs\StoreMediaFromApi;
 use App\Services\MediaDetailFetcherFactory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MediaController extends Controller
 {
-    public function show(Request $request, string $type)
+    public function show(Request $request, string $type, ?string $subtype = null)
     {
         $id = $request->query('id');
         if (!$id) {
@@ -28,7 +29,7 @@ class MediaController extends Controller
 
         try {
             $fetcher = MediaDetailFetcherFactory::make($type);
-            $mediaitem = $fetcher->fetch($id);
+            $mediaitem = $fetcher->fetch($id, $subtype);
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 404);
         }

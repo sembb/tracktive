@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class TmdbDetailFetchService implements MediaDetailFetcherInterface
 {
-    public function fetch(string|int $id): array
+    public function fetch(string|int $id, string $subtype): array
     {
         $token = config('services.tmdb.token');
 

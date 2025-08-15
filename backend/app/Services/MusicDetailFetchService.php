@@ -8,9 +8,52 @@ use Illuminate\Support\Facades\Log;
 
 class MusicDetailFetchService implements MediaDetailFetcherInterface
 {
-    public function fetch(string|int $id): array
+    public function fetch(string|int $id, string $subtype): array
     {
 
+        switch ($subtype) {
+            case 'album':
+                $url = "https://api.deezer.com/album/{$id}";
+                break;
+            case 'track':
+                $url = "https://api.deezer.com/track/{$id}";
+                break;
+            case 'artist':
+                $url = "https://api.deezer.com/artist/{$id}";
+                break;
+            default:
+                throw new \InvalidArgumentException("Unknown subtype: $subtype");
+        }
+
+        $details = Http::get($url);
+
+        if (!($details->successful())) {
+            throw new \RuntimeException('Movie or cast could not be found');
+        }
+
+        $mediaitem = $details->json();
+        $crew = collect([]);
+        $cast = collect([]);
+
+        return [
+            'details' => 
+                [
+                    'id' => $mediaitem['id'],
+                    'title' => $mediaitem['title'],
+                    'overview' => null,
+                    'release_date' => $mediaitem['release_date'],
+                    'poster_path' => $mediaitem['cover_big'] ?? null,
+                    'genres' => null,
+                    'director' => null,
+                    'people' => null,
+                    'runtime' => $mediaitem['duration'] ?? 0,
+                    'budget' => null,
+                    'revenue' => null,
+                    'tagline' => null,
+                ],
+            'crew' => $crew,
+            'cast' => $cast,
+        ];
     }
 
     public function searchMusic(string $query, array $localExternalIds): \Illuminate\Support\Collection

@@ -27,13 +27,14 @@ class SearchController extends Controller
             return [
                 'id' => $item->external_id,
                 'title' => $item->title,
+                'type' => $item->type,
                 'source' => 'cached',
             ];
         });
 
         $localExternalIds = $localResults->pluck('id')->filter()->toArray();
 
-        Log::debug('origin:', ['origin' => $origin]);
+        
 
         $externalResults = match ($origin) {
             'movies' => app(TmdbDetailFetchService::class)->searchMovies($query, $localExternalIds),
