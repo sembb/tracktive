@@ -65,4 +65,4 @@ Route::post('/login', function (Request $request) {
 
 Route::get('/search/{origin}', [SearchController::class, 'search']);
 
-Route::get('/media/{type}/{subtype?}', [MediaController::class, 'show']);
+Route::get('/media/{type}', [MediaController::class, 'show']);

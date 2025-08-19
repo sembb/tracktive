@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class MediaController extends Controller
 {
-    public function show(Request $request, string $type, ?string $subtype = null)
+    public function show(Request $request, string $type)
     {
         $id = $request->query('id');
         if (!$id) {
@@ -29,7 +29,7 @@ class MediaController extends Controller
 
         try {
             $fetcher = MediaDetailFetcherFactory::make($type);
-            $mediaitem = $fetcher->fetch($id, $subtype);
+            $mediaitem = $fetcher->fetch($id);
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 404);
         }

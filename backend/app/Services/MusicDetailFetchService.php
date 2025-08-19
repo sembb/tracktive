@@ -8,22 +8,28 @@ use Illuminate\Support\Facades\Log;
 
 class MusicDetailFetchService implements MediaDetailFetcherInterface
 {
-    public function fetch(string|int $id, string $subtype): array
+    public function __construct(string $type = null)
+    {
+        $this->type = $type;
+    }
+
+    public function fetch(string|int $id): array
     {
 
-        switch ($subtype) {
-            case 'album':
-                $url = "https://api.deezer.com/album/{$id}";
-                break;
-            case 'track':
-                $url = "https://api.deezer.com/track/{$id}";
-                break;
-            case 'artist':
-                $url = "https://api.deezer.com/artist/{$id}";
-                break;
-            default:
-                throw new \InvalidArgumentException("Unknown subtype: $subtype");
-        }
+        return match ($this->type) {
+            'artist' => $this->fetchArtist($id),
+            'album' => $this->fetchAlbum($id),
+            'track' => $this->fetchTrack($id),
+            default => throw new \Exception("Unsupported type: {$this->type}"),
+        };
+
+    }
+
+    protected function fetchArtist($id) { 
+        $url = "https://api.deezer.com/artist/{$id}";
+    }
+    protected function fetchAlbum($id) {
+        $url = "https://api.deezer.com/album/{$id}";
 
         $details = Http::get($url);
 
@@ -54,6 +60,9 @@ class MusicDetailFetchService implements MediaDetailFetcherInterface
             'crew' => $crew,
             'cast' => $cast,
         ];
+    }
+    protected function fetchTrack($id) {
+        $url = "https://api.deezer.com/track/{$id}";
     }
 
     public function searchMusic(string $query, array $localExternalIds): \Illuminate\Support\Collection

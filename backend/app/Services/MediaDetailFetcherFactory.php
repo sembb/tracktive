@@ -11,7 +11,7 @@ class MediaDetailFetcherFactory
         return match ($type) {
             'movie' => new TmdbDetailFetchService(),
             'anime' => new AnilistDetailFetchService(),
-            'music' => new MusicDetailFetchService(),
+            'artist', 'album', 'track' => new MusicDetailFetchService($type),
             default => throw new InvalidArgumentException("Unknown media type: $type"),
         };
     }

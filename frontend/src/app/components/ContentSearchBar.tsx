@@ -75,10 +75,11 @@ export default function SearchBox() {
             const fetchMusicResults = async () => {
                 const res = await fetch(`${apiUrl}/api/search/music?q=${encodeURIComponent(trimmedQuery)}`);
                 const data = await res.json();
+                console.log('Music search results:', data);
                 return {
-                artists: data.filter(i => i.type === 'artist'),
-                albums:  data.filter(i => i.type === 'album'),
-                tracks:  data.filter(i => i.type === 'track')
+                  artists: data.filter(i => i.type.toLowerCase() === 'artist'),
+                  albums:  data.filter(i => i.type.toLowerCase() === 'album'),
+                  tracks:  data.filter(i => i.type.toLowerCase() === 'track')
                 };
             };
 
@@ -95,7 +96,7 @@ export default function SearchBox() {
                         <div style="padding: 6px; font-weight: bold;">Artists</div>`; },
                     item({ item, html }) { return html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`; }
                 },
-                onSelect({ item }) { router.push(`/media/music/artist/${item.id}`); }
+                onSelect({ item }) { router.push(`/media/artist/${item.id}`); }
                 },
                 {
                 sourceId: 'music-albums',
@@ -104,7 +105,7 @@ export default function SearchBox() {
                     header({ html }) { return html`<div style="padding: 6px; font-weight: bold;">Albums</div>`; },
                     item({ item, html }) { return html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`; }
                 },
-                onSelect({ item }) { router.push(`/media/music/album/${item.id}`); }
+                onSelect({ item }) { router.push(`/media/album/${item.id}`); }
                 },
                 {
                 sourceId: 'music-tracks',
@@ -113,7 +114,7 @@ export default function SearchBox() {
                     header({ html }) { return html`<div style="padding: 6px; font-weight: bold;">Tracks</div>`; },
                     item({ item, html }) { return html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`; }
                 },
-                onSelect({ item }) { router.push(`/media/music/track/${item.id}`); }
+                onSelect({ item }) { router.push(`/media/track/${item.id}`); }
                 }
             ]);
         }else{

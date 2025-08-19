@@ -11,7 +11,7 @@ async function getMovie(id: string) {
   const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
   console.log('API URL:', apiUrl);
 
-  const url = `${apiUrl}/api/media/music/album?id=${id}`;
+  const url = `${apiUrl}/api/media/album?id=${id}`;
   console.log('Fetching URL:', url);
 
   try {

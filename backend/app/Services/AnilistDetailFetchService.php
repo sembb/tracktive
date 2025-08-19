@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class AnilistDetailFetchService implements MediaDetailFetcherInterface
 {
-    public function fetch(string|int $id, string $subtype): array
+    public function fetch(string|int $id): array
     {
         $gqlquery = '
             query ($id: Int) {
