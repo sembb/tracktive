@@ -103,7 +103,7 @@ export default function SearchBox() {
                 getItems: async () => (await fetchMusicResults()).albums,
                 templates: {
                     header({ html }) { return html`<div style="padding: 6px; font-weight: bold;">Albums</div>`; },
-                    item({ item, html }) { return html`<div>${item.title}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`; }
+                    item({ item, html }) { return html`<div>${item.title} - ${item.artist}<span className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-500/10 ring-inset">${item.source}</span></div>`; }
                 },
                 onSelect({ item }) { router.push(`/media/album/${item.id}`); }
                 },

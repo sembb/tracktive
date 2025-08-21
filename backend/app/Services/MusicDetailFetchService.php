@@ -38,8 +38,18 @@ class MusicDetailFetchService implements MediaDetailFetcherInterface
         }
 
         $mediaitem = $details->json();
+
+        log::debug('mediaitem:', ['results' => $mediaitem['artist']]);
         $crew = collect([]);
-        $cast = collect([]);
+        $cast = collect($mediaitem['contributors'] ?? [])->map(function ($member) {
+            return [
+                'original_name' => $member['name'] ?? 'Unknown',
+                'character' => null,
+                'character_image_url' => null,
+                'actor_image_url' => $member['picture_medium'] ?? null,
+                'type' => 'artist',
+            ];
+        });
 
         return [
             'details' => 
@@ -96,6 +106,7 @@ class MusicDetailFetchService implements MediaDetailFetcherInterface
                 'title' => $item['title'] ?? $item['name'] ?? 'Untitled',
                 'type' => $item['type'] ?? 'unknown',
                 'source' => 'external',
+                'artist' => $item['artist']['name'] ?? null,
             ];
         });
     }

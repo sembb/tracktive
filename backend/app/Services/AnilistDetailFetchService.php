@@ -96,6 +96,7 @@ class AnilistDetailFetchService implements MediaDetailFetcherInterface
                 'character' => $edge['node']['name']['full'] ?? '',
                 'character_image_url' => $edge['node']['image']['large'] ?? null,
                 'actor_image_url' => $edge['voiceActors'][0]['image']['large'] ?? null,
+                'type' => 'voice_actor',
             ];
         });
 

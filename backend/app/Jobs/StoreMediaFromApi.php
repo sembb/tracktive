@@ -63,7 +63,7 @@ class StoreMediaFromApi implements ShouldQueue
                         ['name' => $castmember['original_name'], 'type' => 'actor'],
                         [
                         'name' => $castmember['original_name'],
-                        'type' => 'actor',
+                        'type' => $castmember['type'] ?? 'actor',
                         'image_url' => $castmember['actor_image_url'] ?? null,
                         ]
                     );

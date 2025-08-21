@@ -29,6 +29,7 @@ class TmdbDetailFetchService implements MediaDetailFetcherInterface
                 'character' => $member['original_name'] ?? '',
                 'character_image_url' => null,
                 'actor_image_url' => $member['profile_path'] ?? null,
+                'type' => 'actor',
             ];
         });
 
