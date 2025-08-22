@@ -60,7 +60,7 @@ class StoreMediaFromApi implements ShouldQueue
                 foreach($this->cast as $castmember){
                     Log::error("Trying to store ".$castmember['original_name'] . $castmember['actor_image_url']);
                     $person = Person::updateOrCreate(
-                        ['name' => $castmember['original_name'], 'type' => 'actor'],
+                        ['name' => $castmember['original_name'], 'type' => $castmember['type'] ?? 'actor'],
                         [
                         'name' => $castmember['original_name'],
                         'type' => $castmember['type'] ?? 'actor',
@@ -70,7 +70,7 @@ class StoreMediaFromApi implements ShouldQueue
 
                     $newitem->people()->syncWithoutDetaching([
                         $person->id => [
-                            'role' => 'actor',
+                            'role' => $castmember['role'] ?? 'actor',
                             'character_name' => $castmember['character'],
                             'image_url' => $castmember['character_image_url'] ?? null,
                         ]

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Models\MediaItem;
 
 class TmdbDetailFetchService implements MediaDetailFetcherInterface
 {
@@ -64,7 +65,7 @@ class TmdbDetailFetchService implements MediaDetailFetcherInterface
             ];
     }
 
-    public function searchMovies(string $query, array $localExternalIds): \Illuminate\Support\Collection
+    public function searchMovies(string $query): \Illuminate\Support\Collection
     {
             $externalResponse = Http::withToken(config('services.tmdb.token'))
             ->get('https://api.themoviedb.org/3/search/movie', [
@@ -73,7 +74,20 @@ class TmdbDetailFetchService implements MediaDetailFetcherInterface
 
             $externalRaw = $externalResponse->json()['results'] ?? [];
 
-            return collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
+            $localResults = MediaItem::where('title', 'like', '%' . $query . '%')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->external_id,
+                    'title' => $item->title,
+                    'type' => $item->type,
+                    'source' => 'cached',
+                ];
+            });
+
+            $localExternalIds = $localResults->pluck('id')->filter()->toArray();
+
+            $externalResults = collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
                 return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
             })->map(function ($item) {
                 return [
@@ -82,5 +96,7 @@ class TmdbDetailFetchService implements MediaDetailFetcherInterface
                     'source' => 'external',
                 ];
             });
+
+            return $localResults->concat($externalResults)->values();
     }
 }

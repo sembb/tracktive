@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\MediaItem;
 
 class MusicDetailFetchService implements MediaDetailFetcherInterface
 {
@@ -41,13 +42,25 @@ class MusicDetailFetchService implements MediaDetailFetcherInterface
 
         log::debug('mediaitem:', ['results' => $mediaitem['artist']]);
         $crew = collect([]);
-        $cast = collect($mediaitem['contributors'] ?? [])->map(function ($member) {
+        $mainArtist = $mediaitem['artist'] ?? null;
+        $contributors = $mediaitem['contributors'] ?? [];
+
+        // Tag each one with a source
+        $items = collect(array_merge(
+            $mainArtist ? [array_merge($mainArtist, ['_source' => 'artist'])] : [],
+            array_map(fn($c) => array_merge($c, ['_source' => 'contributor']), $contributors)
+        ));
+
+        $cast = $items
+        ->unique('id') // remove duplicates by artist id
+        ->map(function ($member) {
             return [
                 'original_name' => $member['name'] ?? 'Unknown',
                 'character' => null,
                 'character_image_url' => null,
                 'actor_image_url' => $member['picture_medium'] ?? null,
                 'type' => 'artist',
+                'role' => $member['_source'] === 'artist' ? 'artist' : 'contributor',
             ];
         });
 
@@ -75,7 +88,7 @@ class MusicDetailFetchService implements MediaDetailFetcherInterface
         $url = "https://api.deezer.com/track/{$id}";
     }
 
-    public function searchMusic(string $query, array $localExternalIds): \Illuminate\Support\Collection
+    public function searchMusic(string $query): \Illuminate\Support\Collection
     {
         [$tracks, $albums, $artist] = Http::pool(fn ($pool) => [
             $pool->get("https://api.deezer.com/search/album", ['q' => $query, 'limit' => 5]),
@@ -96,9 +109,24 @@ class MusicDetailFetchService implements MediaDetailFetcherInterface
             $externalRawAlbums,
             $externalRawTracks
         );
-        log::debug('Music search results:', ['results' => $externalRawAlbums, 'tracks' => $externalRawTracks, 'artists' => $externalRawArtists]);
+        
+        // 1. Get local (cached) results
+        $localResults = MediaItem::where('title', 'like', '%' . $query . '%')
+        ->with(['people'])
+        ->get()
+        ->map(function ($item) {
+            return [
+                'id' => $item->external_id,
+                'title' => $item->title,
+                'type' => $item->type,
+                'source' => 'cached',
+                'artist' => $item->people->where('pivot.role', 'artist')->first()->name ?? null,
+            ];
+        });
 
-        return collect($externalResults)->filter(function ($item) use ($localExternalIds) {
+        $localExternalIds = $localResults->pluck('id')->filter()->toArray();
+
+        $externalResults = collect($externalResults)->filter(function ($item) use ($localExternalIds) {
             return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
         })->map(function ($item) {
             return [
@@ -109,5 +137,7 @@ class MusicDetailFetchService implements MediaDetailFetcherInterface
                 'artist' => $item['artist']['name'] ?? null,
             ];
         });
+
+        return $localResults->concat($externalResults)->values();
     }
 }

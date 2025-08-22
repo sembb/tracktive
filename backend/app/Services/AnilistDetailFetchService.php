@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Models\MediaItem;
 
 class AnilistDetailFetchService implements MediaDetailFetcherInterface
 {
@@ -127,7 +128,7 @@ class AnilistDetailFetchService implements MediaDetailFetcherInterface
         ];
     }
 
-    public function searchAnime(string $query, array $localExternalIds): \Illuminate\Support\Collection
+    public function searchAnime(string $query): \Illuminate\Support\Collection
     {
         $gqlquery = '
                 query ($search: String, $page: Int) {
@@ -163,7 +164,21 @@ class AnilistDetailFetchService implements MediaDetailFetcherInterface
             if ($externalResponse->successful()) {
                 $externalRaw = $externalResponse->json()['data']['Page']['media'] ?? [];
 
-                return collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
+                // 1. Get local (cached) results
+                $localResults = MediaItem::where('title', 'like', '%' . $query . '%')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->external_id,
+                        'title' => $item->title,
+                        'type' => $item->type,
+                        'source' => 'cached',
+                    ];
+                });
+
+                $localExternalIds = $localResults->pluck('id')->filter()->toArray();
+
+                $externalResults = collect($externalRaw)->filter(function ($item) use ($localExternalIds) {
                     return !in_array((string) ($item['id'] ?? ''), $localExternalIds);
                 })->map(function ($item) {
                     return [
@@ -172,6 +187,7 @@ class AnilistDetailFetchService implements MediaDetailFetcherInterface
                         'source' => 'external',
                     ];
                 });
+                return $localResults->concat($externalResults)->values();
             } else {
                 return response()->json(['error' => 'Failed to fetch data'], 500);
             }

@@ -20,36 +20,12 @@ class SearchController extends Controller
             return response()->json([]);
         }
 
-        // 1. Get local (cached) results
-        $localResults = MediaItem::where('title', 'like', '%' . $query . '%')
-        ->get()
-        ->map(function ($item) {
-            return [
-                'id' => $item->external_id,
-                'title' => $item->title,
-                'type' => $item->type,
-                'source' => 'cached',
-            ];
-        });
-
-        $localExternalIds = $localResults->pluck('id')->filter()->toArray();
-
-        
-
-        $externalResults = match ($origin) {
-            'movies' => app(TmdbDetailFetchService::class)->searchMovies($query, $localExternalIds),
-            'anime' => app(AnilistDetailFetchService::class)->searchAnime($query, $localExternalIds),
-            'music' => app(MusicDetailFetchService::class)->searchMusic($query, $localExternalIds),
+        $combined = match ($origin) {
+            'movies' => app(TmdbDetailFetchService::class)->searchMovies($query),
+            'anime' => app(AnilistDetailFetchService::class)->searchAnime($query),
+            'music' => app(MusicDetailFetchService::class)->searchMusic($query),
             default => collect([]),
         };
-
-        // 4. Merge results (cached first)
-        $combined = $localResults->concat($externalResults)->values();
-
-        // 5. Log output safely
-        Log::debug('Local results:', ['local' => $localResults->toArray()]);
-        Log::debug('External results:', ['external' => $externalResults->toArray()]);
-        Log::debug('Combined results:', ['combined' => $combined->toArray()]);
 
         return response()->json($combined);
     }
