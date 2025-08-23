@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Models\Person;
+use App\Models\Review;
 
 class MediaItem extends Model
 {
@@ -41,5 +42,10 @@ class MediaItem extends Model
         return $this->belongsToMany(Person::class, 'media_item_person', 'media_item_id', 'person_id')
             ->withPivot('role', 'character_name', 'image_url') // optional: if you're storing extra data
             ->withTimestamps();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

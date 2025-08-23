@@ -10,6 +10,8 @@ class Review extends Model
     public $incrementing = false;        // Geen auto-increment
     protected $keyType = 'string';       // UUID als string
 
+    protected $fillable = ['rating', 'review_text', 'user_id', 'media_item_id', 'id'];
+
     protected static function boot()
     {
         parent::boot();

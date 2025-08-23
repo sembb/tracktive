@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import WriteReviewSection from '@/app/components/WriteReviewSection';
 
 interface Movie {
   title: string;
@@ -69,6 +70,7 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 					<span>{normalizedMovie.release_date}</span>
           			<div className='my-4'>{normalizedMovie.description}</div>
 				</div>
+				<WriteReviewSection media={normalizedMovie} />
 			</div>
         </div>
     )
