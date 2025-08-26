@@ -9,60 +9,66 @@ use App\Http\Controllers\MediaController;
 use App\Models\MediaItem;
 use App\Http\Controllers\SearchController;
 
-Route::middleware('auth:sanctum')->get('/user', function(Request $request) {
-    \Log::info('Session cookie name:', [config('session.cookie')]);
-    return $request->user()->load('profile');
+Route::middleware('api')->group(function () {
+    Route::middleware('auth:sanctum')->get('/user', function(Request $request) {
+        \Log::info('Session cookie name:', [config('session.cookie')]);
+        return $request->user()->load('profile');
+    });
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::apiResource('profiles', UserProfileController::class);
+    });
+
+    Route::middleware('auth:sanctum')->post('/logout', function(Request $request) {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Logged out']);
+    });
+
+    Route::get('/user/{slug}', function(string $slug){
+        return User::where('name', $slug)->firstOrFail()->load('profile');
+    });
+
+    Route::post('/register', function(Request $request) {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed', // verwacht password_confirmation ook
+        ]);
+
+        \Log::info('Register request received', $request->all());
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+        
+
+        return response()->json(['message' => 'Registratie gelukt!'], 201);
+    });
+
+    Route::post('/login', function (Request $request) {
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+
+        $user->tokens()->delete(); // optional — only if you want 1 active token per user
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+        ]);
+    });
+
+    Route::get('/search/{origin}', [SearchController::class, 'search']);
+
+    Route::prefix('media')->group(function () {
+        Route::post('/action', [MediaController::class, 'handleAction'])->middleware('auth:sanctum');
+        Route::get('/{type}', [MediaController::class, 'show'])
+            ->where('type', 'movie|anime|album|track|artist');
+    });
 });
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('profiles', UserProfileController::class);
-});
-
-Route::middleware('auth:sanctum')->post('/logout', function(Request $request) {
-    $request->user()->currentAccessToken()->delete();
-
-    return response()->json(['message' => 'Logged out']);
-});
-
-Route::get('/user/{slug}', function(string $slug){
-    return User::where('name', $slug)->firstOrFail()->load('profile');
-});
-
-Route::post('/register', function(Request $request) {
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:8|confirmed', // verwacht password_confirmation ook
-    ]);
-
-    \Log::info('Register request received', $request->all());
-
-    $user = User::create([
-        'name' => $validated['name'],
-        'email' => $validated['email'],
-        'password' => Hash::make($validated['password']),
-    ]);
-    
-
-    return response()->json(['message' => 'Registratie gelukt!'], 201);
-});
-
-Route::post('/login', function (Request $request) {
-    $user = User::where('email', $request->email)->first();
-
-    if (! $user || ! Hash::check($request->password, $user->password)) {
-        return response()->json(['message' => 'Invalid credentials'], 401);
-    }
-
-    $user->tokens()->delete(); // optional — only if you want 1 active token per user
-    $token = $user->createToken('auth_token')->plainTextToken;
-
-    return response()->json([
-        'user' => $user,
-        'token' => $token,
-    ]);
-});
-
-Route::get('/search/{origin}', [SearchController::class, 'search']);
-
-Route::get('/media/{type}', [MediaController::class, 'show']);

@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use App\Models\Person;
 use App\Models\Review;
+use App\Models\MediaLike;
+use App\Models\MediaConsumed;
+use App\Models\MediaWishlist;
 
 class MediaItem extends Model
 {
@@ -25,6 +28,17 @@ class MediaItem extends Model
     'metadata_json',
     'last_synced_at',
     ];
+
+    protected $appends = ['liked'];
+
+    public function getLikedAttribute()
+    {
+        if (!auth()->check()) return false;
+
+        return $this->likes()
+            ->where('user_id', auth()->id())
+            ->exists();
+    }
 
     protected static function boot()
     {
@@ -47,5 +61,10 @@ class MediaItem extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function likes()
+    {   
+        return $this->hasMany(MediaLike::class);
     }
 }

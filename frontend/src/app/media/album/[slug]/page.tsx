@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import WriteReviewSection from '@/app/components/WriteReviewSection';
+import { useState } from 'react';
+import { initializeMediaStore } from '../../../../../lib/stores/mediaStore';
 
 interface Movie {
   title: string;
@@ -44,6 +46,7 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 		: movie.metadata_json || '';
 
 	const normalizedMovie = {
+		id: movie.id,
 		title: movie.title,
 		release_date: movie.release_date,
 		image_url: movie.poster_path || movie.image_url, // eerst API, anders DB
@@ -51,7 +54,10 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 		description: movie.description || movie.overview || '', // fallback to overview if description is not available
 		tagline: metadata.tagline || movie.tagline || '',
 		runtime: metadata.runtime || movie.runtime || 0, // fallback to movie runtime if metadata is not available
+		liked: movie.liked || false,
 	}
+
+	initializeMediaStore({liked: normalizedMovie.liked});
 
     return(
         <div className="container mx-auto">

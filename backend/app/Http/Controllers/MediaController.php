@@ -30,6 +30,15 @@ class MediaController extends Controller
         try {
             $fetcher = MediaDetailFetcherFactory::make($type);
             $mediaitem = $fetcher->fetch($id);
+
+            if(auth()->check()) {
+                $mediaitem['details']['liked'] = MediaItem::where('user_id', auth()->id())
+                    ->where('media_id', $mediaItem->id)
+                    ->exists();
+            } else {
+                $mediaitem['details']['liked'] = false;
+            }
+
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 404);
         }
@@ -39,5 +48,38 @@ class MediaController extends Controller
         }
 
         return response()->json($mediaitem['details']);
+    }
+
+    public function handleAction(Request $request)
+    {
+        $data = $request->json()->all();
+        echo 'wtf';
+        die();
+        $mediaId = $data['mediaId'] ?? null;
+        $action = $data['action'] ?? null;
+
+        if (!$mediaId || !$action) {
+            return response()->json(['error' => 'Missing parameters'], 400);
+        }
+
+        $mediaItem = MediaItem::where('external_id', $mediaId)->first();
+        if (!$mediaItem) {
+            return response()->json(['error' => 'Media item not found'], 404);
+        }
+
+        switch ($action) {
+            case 'like':
+                $like = $mediaItem->likes()->firstOrNew(['user_id' => auth()->id()]);
+                $like->liked = ! $like->liked;
+                $like->save();
+                break;
+            case 'unlike':
+                $mediaItem->likes()->where('user_id', auth()->id())->delete();
+                break;
+            default:
+                return response()->json(['error' => 'Invalid action'], 400);
+        }
+
+        return response()->json(['success' => true, 'liked' => $action === 'like']);
     }
 }
