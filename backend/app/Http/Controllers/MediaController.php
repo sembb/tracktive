@@ -21,6 +21,10 @@ class MediaController extends Controller
             ->where('external_id', $id)
             ->where('type', $type)
             ->first();
+            
+        $model->liked = $model->checkLiked(auth('sanctum')->user());
+
+        
 
         // Return cached if fresh
         if ($model && $model->updated_at->gt(now()->subDays(3))) {
@@ -32,8 +36,11 @@ class MediaController extends Controller
             $mediaitem = $fetcher->fetch($id);
 
             if(auth()->check()) {
-                $mediaitem['details']['liked'] = MediaItem::where('user_id', auth()->id())
-                    ->where('media_id', $mediaItem->id)
+
+                $mediaitem['details']['liked'] = MediaItem::where('external_id', $id)
+                    ->whereHas('likes', function ($query) {
+                        $query->where('user_id', auth()->id());
+                    })
                     ->exists();
             } else {
                 $mediaitem['details']['liked'] = false;
@@ -53,8 +60,6 @@ class MediaController extends Controller
     public function handleAction(Request $request)
     {
         $data = $request->json()->all();
-        echo 'wtf';
-        die();
         $mediaId = $data['mediaId'] ?? null;
         $action = $data['action'] ?? null;
 
@@ -62,16 +67,25 @@ class MediaController extends Controller
             return response()->json(['error' => 'Missing parameters'], 400);
         }
 
-        $mediaItem = MediaItem::where('external_id', $mediaId)->first();
+        $mediaItem = MediaItem::where('id', $mediaId)->first();
         if (!$mediaItem) {
             return response()->json(['error' => 'Media item not found'], 404);
         }
 
         switch ($action) {
             case 'like':
-                $like = $mediaItem->likes()->firstOrNew(['user_id' => auth()->id()]);
-                $like->liked = ! $like->liked;
-                $like->save();
+                $like = $mediaItem->likes()->where('user_id', auth()->id());
+
+                if ($like->exists()) {
+                    // If it exists, remove it
+                    $like->delete();
+                } else {
+                    // If it doesn't exist, create it
+                    $mediaItem->likes()->create([
+                        'user_id' => auth()->id(),
+                        // add any other required columns here
+                    ]);
+                }
                 break;
             case 'unlike':
                 $mediaItem->likes()->where('user_id', auth()->id())->delete();

@@ -32,7 +32,7 @@ export const MediaLikeButton = ({ id }: MediaLikeButtonProps) => {
                 },
             });
             if (res.ok) {
-                setLiked(prev => !prev);
+                setLiked(!liked);
             }
 
             if (res.status === 401) {
@@ -41,6 +41,7 @@ export const MediaLikeButton = ({ id }: MediaLikeButtonProps) => {
             }
         } finally {
             setIsLiking(false);
+            console.log(liked);
         }
     };
 

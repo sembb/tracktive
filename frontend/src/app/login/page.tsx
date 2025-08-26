@@ -21,10 +21,9 @@ export default function Login() {
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
     console.log('API URL:', apiUrl); // Debugging output
 
-    const res = await csrfFetch(`${apiUrl}/api/login`, {
+    const res = await fetch(`${apiUrl}/api/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include", // belangrijk voor cookies
       body: JSON.stringify({ email, password }),
     });
 

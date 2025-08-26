@@ -9,6 +9,7 @@ use App\Models\Review;
 use App\Models\MediaLike;
 use App\Models\MediaConsumed;
 use App\Models\MediaWishlist;
+use Illuminate\Support\Facades\Log;
 
 class MediaItem extends Model
 {
@@ -29,15 +30,11 @@ class MediaItem extends Model
     'last_synced_at',
     ];
 
-    protected $appends = ['liked'];
-
-    public function getLikedAttribute()
+    public function checkLiked(?User $user)
     {
-        if (!auth()->check()) return false;
+        if (!$user) return false;
 
-        return $this->likes()
-            ->where('user_id', auth()->id())
-            ->exists();
+        return $this->likes()->where('user_id', $user->id)->exists();
     }
 
     protected static function boot()
@@ -65,6 +62,6 @@ class MediaItem extends Model
 
     public function likes()
     {   
-        return $this->hasMany(MediaLike::class);
+        return $this->hasMany(MediaLike::class, 'media_id');
     }
 }
