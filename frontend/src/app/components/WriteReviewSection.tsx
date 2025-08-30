@@ -2,11 +2,21 @@
 
 import { useState, useEffect, useRef } from "react";
 import { MediaLikeButton } from "./MediaLikeButton";
+import { fetchUserFromServer } from "../../../lib/user";
 
 export default function WriteReviewSection({media}: any) {
 
     const [value, setValue] = useState(50);
     const rangeRef = useRef<HTMLInputElement>(null);
+    const [loggedIn, setLoggedIn] = useState(null);
+
+    useEffect(() => {
+        async function fetchUser() {
+        const user = await fetchUserFromServer();
+        setLoggedIn(user);
+        }
+        fetchUser();
+    }, []);
 
     // Compute the gradient based on value
     const getGradient = (val: number) => {
@@ -24,10 +34,14 @@ export default function WriteReviewSection({media}: any) {
         }
     }, [value]);
 
+    console.log(loggedIn);
     console.log('Rendering WriteReviewSection for media:', media.id);
 
     return(
-        <div><button className="btn" onClick={()=>document.getElementById('my_modal_3').showModal()}>Write a review</button>
+        loggedIn && (
+        <div>
+            
+            <button className="btn" onClick={()=>document.getElementById('my_modal_3').showModal()}>Write a review</button>
             <dialog id="my_modal_3" className="modal">
             <div className="modal-box">
                 <form method="dialog">
@@ -66,5 +80,6 @@ export default function WriteReviewSection({media}: any) {
             </div>
             </dialog>
         </div>
+        )
     );
 }

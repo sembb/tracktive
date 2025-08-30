@@ -11,7 +11,6 @@ use App\Http\Controllers\SearchController;
 
 Route::middleware('api')->group(function () {
     Route::middleware('auth:sanctum')->get('/user', function(Request $request) {
-        \Log::info('Session cookie name:', [config('session.cookie')]);
         return $request->user()->load('profile');
     });
 
