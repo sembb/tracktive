@@ -1,13 +1,16 @@
 import React from 'react'
 
 import { useMediaStore } from '../../../lib/stores/mediaStore';
+import { initializeMediaStore } from '../../../lib/stores/mediaStore';
 import { useState } from 'react';
 
 type MediaLikeButtonProps = {
   id: string;
+  likedinit: any;
 };
 
-export const MediaLikeButton = ({ id }: MediaLikeButtonProps) => {
+export const MediaLikeButton = ({ id, likedinit }: MediaLikeButtonProps) => {
+    initializeMediaStore(likedinit)
     const { liked, setLiked } = useMediaStore();
     const [isLiking, setIsLiking] = useState(false);
 

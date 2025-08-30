@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\UserProfile;
 use Illuminate\Support\Str;
+use App\Models\MediaLike;
 
 class User extends Authenticatable
 {
@@ -39,6 +40,13 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function checkLiked(?string $mediaitem)
+    {
+        if (!$mediaitem) return false;
+
+        return $this->likes()->where('media_id', $mediaitem)->exists();
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -66,5 +74,10 @@ class User extends Authenticatable
     public function profile()
     {
         return $this->hasOne(UserProfile::class);
+    }
+
+    public function likes()
+    {   
+        return $this->hasMany(MediaLike::class, 'user_id');
     }
 }

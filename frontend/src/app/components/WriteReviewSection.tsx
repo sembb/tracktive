@@ -12,7 +12,7 @@ export default function WriteReviewSection({media}: any) {
 
     useEffect(() => {
         async function fetchUser() {
-        const user = await fetchUserFromServer();
+        const user = await fetchUserFromServer(media.id);
         setLoggedIn(user);
         }
         fetchUser();
@@ -38,7 +38,7 @@ export default function WriteReviewSection({media}: any) {
     console.log('Rendering WriteReviewSection for media:', media.id);
 
     return(
-        loggedIn && (
+        loggedIn ? (
         <div>
             
             <button className="btn" onClick={()=>document.getElementById('my_modal_3').showModal()}>Write a review</button>
@@ -68,7 +68,7 @@ export default function WriteReviewSection({media}: any) {
                         </div>
                     </div>
 
-                    <MediaLikeButton id={media.id} />
+                    <MediaLikeButton id={media.id} likedinit={loggedIn} />
                 </fieldset>
 
                 <fieldset className="fieldset">
@@ -80,6 +80,10 @@ export default function WriteReviewSection({media}: any) {
             </div>
             </dialog>
         </div>
+        ) : (
+            <div>
+                Log in to write a review
+            </div>
         )
     );
 }

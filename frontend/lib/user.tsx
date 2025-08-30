@@ -1,9 +1,11 @@
-export async function fetchUserFromServer() {
+export async function fetchUserFromServer(mediaid: string) {
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
+    const query = new URLSearchParams();
+    if (mediaid) query.append('mediaid', mediaid);
     console.log('Fetching user from:', apiUrl);
     if(localStorage.getItem('auth_token')){
         try {
-            const res = await fetch(`${apiUrl}/api/user`, {
+            const res = await fetch(`${apiUrl}/api/user?${query.toString()}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
