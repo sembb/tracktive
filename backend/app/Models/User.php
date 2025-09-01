@@ -10,6 +10,8 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\UserProfile;
 use Illuminate\Support\Str;
 use App\Models\MediaLike;
+use App\Models\MediaConsumed;
+use App\Models\MediaWishlist;
 
 class User extends Authenticatable
 {
@@ -47,6 +49,13 @@ class User extends Authenticatable
         return $this->likes()->where('media_id', $mediaitem)->exists();
     }
 
+        public function checkConsumed(?string $mediaitem)
+    {
+        if (!$mediaitem) return false;
+
+        return $this->consumed()->where('media_id', $mediaitem)->exists();
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -79,5 +88,15 @@ class User extends Authenticatable
     public function likes()
     {   
         return $this->hasMany(MediaLike::class, 'user_id');
+    }
+
+    public function consumed()
+    {   
+        return $this->hasMany(MediaConsumed::class, 'user_id');
+    }
+
+    public function wishlist()
+    {   
+        return $this->hasMany(MediaWishlist::class, 'user_id');
     }
 }

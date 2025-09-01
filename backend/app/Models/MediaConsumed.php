@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MediaConsumed extends Model
 {
+    protected $table = 'media_consumed';
     protected $fillable = [
         'user_id',
         'media_id',

@@ -35,7 +35,7 @@ export default function WriteReviewSection({media}: any) {
     }, [value]);
 
     console.log(loggedIn);
-    console.log('Rendering WriteReviewSection for media:', media.id);
+    console.log(media);
 
     return(
         loggedIn ? (
@@ -68,7 +68,8 @@ export default function WriteReviewSection({media}: any) {
                         </div>
                     </div>
 
-                    <MediaLikeButton id={media.id} likedinit={loggedIn} />
+                    <MediaLikeButton id={media.id} init={loggedIn} action='like' type={media.mediatype} />
+                    <MediaLikeButton id={media.id} init={loggedIn} action='consumed' type={media.mediatype} />
                 </fieldset>
 
                 <fieldset className="fieldset">

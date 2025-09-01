@@ -64,4 +64,14 @@ class MediaItem extends Model
     {   
         return $this->hasMany(MediaLike::class, 'media_id');
     }
+
+    public function consumed()
+    {   
+        return $this->hasMany(MediaConsumed::class, 'media_id');
+    }
+
+    public function wishlist()
+    {   
+        return $this->hasMany(MediaWishlist::class, 'media_id');
+    }
 }

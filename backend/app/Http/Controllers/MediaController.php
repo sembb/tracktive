@@ -74,11 +74,11 @@ class MediaController extends Controller
 
         switch ($action) {
             case 'like':
-                $like = $mediaItem->likes()->where('user_id', auth()->id());
+                $process = $mediaItem->likes()->where('user_id', auth()->id());
 
-                if ($like->exists()) {
+                if ($process->exists()) {
                     // If it exists, remove it
-                    $like->delete();
+                    $process->delete();
                 } else {
                     // If it doesn't exist, create it
                     $mediaItem->likes()->create([
@@ -87,8 +87,19 @@ class MediaController extends Controller
                     ]);
                 }
                 break;
-            case 'unlike':
-                $mediaItem->likes()->where('user_id', auth()->id())->delete();
+            case 'consumed':
+                $process = $mediaItem->consumed()->where('user_id', auth()->id());
+
+                if ($process->exists()) {
+                    // If it exists, remove it
+                    $process->delete();
+                } else {
+                    // If it doesn't exist, create it
+                    $mediaItem->consumed()->create([
+                        'user_id' => auth()->id(),
+                        // add any other required columns here
+                    ]);
+                }
                 break;
             default:
                 return response()->json(['error' => 'Invalid action'], 400);

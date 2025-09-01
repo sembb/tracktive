@@ -47,6 +47,7 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 
 	const normalizedMovie = {
 		id: movie.id,
+		mediatype: 'music',
 		title: movie.title,
 		release_date: movie.release_date,
 		image_url: movie.poster_path || movie.image_url, // eerst API, anders DB

@@ -12,7 +12,10 @@ use App\Http\Controllers\SearchController;
 Route::middleware('api')->group(function () {
     Route::middleware('auth:sanctum')->get('/user', function(Request $request) {
         if($request->mediaid){
-            return response()->json(['liked' => $request->user()->checkLiked($request->mediaid)]);
+            return response()->json([
+                'liked' => $request->user()->checkLiked($request->mediaid), 
+                'consumed' => $request->user()->checkConsumed($request->mediaid)
+            ]);
         }else{
             return $request->user()->load('profile');
         }
