@@ -11,7 +11,7 @@ use App\Http\Controllers\SearchController;
 
 Route::middleware('api')->group(function () {
     Route::middleware('auth:sanctum')->get('/user', function(Request $request) {
-        if($request->mediaid){
+        if($request->mediaid && $request->user()){
             return response()->json([
                 'liked' => $request->user()->checkLiked($request->mediaid), 
                 'consumed' => $request->user()->checkConsumed($request->mediaid),
@@ -75,6 +75,7 @@ Route::middleware('api')->group(function () {
 
     Route::prefix('media')->group(function () {
         Route::post('/action', [MediaController::class, 'handleAction'])->middleware('auth:sanctum');
+        Route::post('/createreview', [MediaController::class, 'createReview'])->middleware('auth:sanctum');
         Route::get('/{type}', [MediaController::class, 'show'])
             ->where('type', 'movie|anime|album|track|artist');
     });

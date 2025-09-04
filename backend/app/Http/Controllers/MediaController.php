@@ -21,8 +21,6 @@ class MediaController extends Controller
             ->where('external_id', $id)
             ->where('type', $type)
             ->first();
-            
-        $model->liked = $model->checkLiked(auth('sanctum')->user());
 
         // Return cached if fresh
         if ($model && $model->updated_at->gt(now()->subDays(3))) {
@@ -32,17 +30,6 @@ class MediaController extends Controller
         try {
             $fetcher = MediaDetailFetcherFactory::make($type);
             $mediaitem = $fetcher->fetch($id);
-
-            if(auth()->check()) {
-
-                $mediaitem['details']['liked'] = MediaItem::where('external_id', $id)
-                    ->whereHas('likes', function ($query) {
-                        $query->where('user_id', auth()->id());
-                    })
-                    ->exists();
-            } else {
-                $mediaitem['details']['liked'] = false;
-            }
 
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 404);
@@ -64,6 +51,7 @@ class MediaController extends Controller
         if (!$mediaId || !$action) {
             return response()->json(['error' => 'Missing parameters'], 400);
         }
+        log::info("Handling action", ['mediaId' => $mediaId, 'action' => $action, 'userId' => auth()->id()]);
         $mediaItem = MediaItem::where('id', $mediaId)->first();
         if (!$mediaItem) {
             return response()->json(['error' => 'Media item not found'], 404);

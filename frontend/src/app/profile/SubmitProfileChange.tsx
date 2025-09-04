@@ -11,8 +11,6 @@ export default function SubmitProfileChange({ formRef }: Props) {
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
     console.log('API URL:', apiUrl); // Debugging output
 
-    const { csrfFetch, loading } = useCsrfFetch();
-
     const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         const form = formRef.current;

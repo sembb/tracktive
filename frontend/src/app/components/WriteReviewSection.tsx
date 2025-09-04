@@ -37,6 +37,17 @@ export default function WriteReviewSection({media}: any) {
     console.log(loggedIn);
     console.log(media);
 
+    function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+        // Hier kan je de review versturen naar de backend
+        console.log('Review submitted:', {
+            score: formData.get('score'),
+            review: formData.get('review'),
+        });
+    }
+
     return(
         loggedIn ? (
         <div>
@@ -49,35 +60,39 @@ export default function WriteReviewSection({media}: any) {
                 <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                 </form>
                 <h3 className="font-bold text-lg">Write a review for {media.title}</h3>
-                <fieldset className="fieldset grid-cols-2">
-                    <div>
-                        <legend className="fieldset-legend">Review score</legend>
-                        <div className="flex flex-col gap-6">
-                            <input
-                            type="number"
-                            className="input input-xl validator text-3xl w-30 text-center"
-                            required
-                            placeholder="1-100"
-                            min="1"
-                            max="100"
-                            title="Must be between be 1 to 100"
-                            onChange={(e) => setValue(Number(e.target.value))}
-                            ref={rangeRef}
-                            style={{ color: `rgb(${255 - Math.round((value / 100) * 255)}, ${Math.round((value / 100) * 255)}, 0)` }}
-                            />
+                <form onSubmit={handleSubmit}>
+                    <fieldset className="fieldset grid-cols-2">
+                        <div>
+                            <legend className="fieldset-legend">Review score</legend>
+                            <div className="flex flex-col gap-6">
+                                <input
+                                type="number"
+                                name="score"
+                                className="input input-xl validator text-3xl w-30 text-center"
+                                required
+                                placeholder="1-100"
+                                min="1"
+                                max="100"
+                                title="Must be between be 1 to 100"
+                                onChange={(e) => setValue(Number(e.target.value))}
+                                ref={rangeRef}
+                                style={{ color: `rgb(${255 - Math.round((value / 100) * 255)}, ${Math.round((value / 100) * 255)}, 0)` }}
+                                />
+                            </div>
                         </div>
-                    </div>
-
-                    <MediaLikeButton id={media.id} init={loggedIn} action='like' type={media.mediatype} />
-                    <MediaLikeButton id={media.id} init={loggedIn} action='consumed' type={media.mediatype} />
-                    <MediaLikeButton id={media.id} init={loggedIn} action='wishlist' type={media.mediatype} />
-                </fieldset>
-
-                <fieldset className="fieldset">
-                    <legend className="fieldset-legend">Your review</legend>
-                    <textarea className="textarea textarea-bordered w-full" placeholder="Write your review here..."></textarea>
-                </fieldset>
-                <input type="submit" value="Submit" className="btn" />
+                        <div className="grid grid-cols-3">
+                            <MediaLikeButton id={media.id} init={loggedIn} action='like' type={media.mediatype} />
+                            <MediaLikeButton id={media.id} init={loggedIn} action='consumed' type={media.mediatype} />
+                            <MediaLikeButton id={media.id} init={loggedIn} action='wishlist' type={media.mediatype} />
+                        </div>
+                    </fieldset>
+                
+                    <fieldset className="fieldset">
+                        <legend className="fieldset-legend">Your review</legend>
+                        <textarea name="review" className="textarea textarea-bordered w-full" placeholder="Write your review here..."></textarea>
+                    </fieldset>
+                    <input type="submit" value="Submit" className="btn mt-2" />
+                </form>
                 <p className="py-4">Press ESC key or click on ✕ button to close</p>
             </div>
             </dialog>
