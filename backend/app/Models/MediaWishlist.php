@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MediaWishlist extends Model
 {
+    protected $table = 'media_wishlist';
     protected $fillable = [
         'user_id',
         'media_id',

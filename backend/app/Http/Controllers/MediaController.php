@@ -24,8 +24,6 @@ class MediaController extends Controller
             
         $model->liked = $model->checkLiked(auth('sanctum')->user());
 
-        
-
         // Return cached if fresh
         if ($model && $model->updated_at->gt(now()->subDays(3))) {
             return response()->json($model);
@@ -66,7 +64,6 @@ class MediaController extends Controller
         if (!$mediaId || !$action) {
             return response()->json(['error' => 'Missing parameters'], 400);
         }
-
         $mediaItem = MediaItem::where('id', $mediaId)->first();
         if (!$mediaItem) {
             return response()->json(['error' => 'Media item not found'], 404);
@@ -96,6 +93,20 @@ class MediaController extends Controller
                 } else {
                     // If it doesn't exist, create it
                     $mediaItem->consumed()->create([
+                        'user_id' => auth()->id(),
+                        // add any other required columns here
+                    ]);
+                }
+                break;
+            case 'wishlist':
+                $process = $mediaItem->wishlist()->where('user_id', auth()->id());
+
+                if ($process->exists()) {
+                    // If it exists, remove it
+                    $process->delete();
+                } else {
+                    // If it doesn't exist, create it
+                    $mediaItem->wishlist()->create([
                         'user_id' => auth()->id(),
                         // add any other required columns here
                     ]);

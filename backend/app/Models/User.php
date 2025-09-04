@@ -49,11 +49,18 @@ class User extends Authenticatable
         return $this->likes()->where('media_id', $mediaitem)->exists();
     }
 
-        public function checkConsumed(?string $mediaitem)
+    public function checkConsumed(?string $mediaitem)
     {
         if (!$mediaitem) return false;
 
         return $this->consumed()->where('media_id', $mediaitem)->exists();
+    }
+
+    public function checkWishlist(?string $mediaitem)
+    {
+        if (!$mediaitem) return false;
+
+        return $this->wishlist()->where('media_id', $mediaitem)->exists();
     }
 
     protected static function boot()

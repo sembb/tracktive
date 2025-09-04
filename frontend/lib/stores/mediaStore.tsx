@@ -5,8 +5,8 @@ interface MediaState {
   setLiked: (liked: boolean) => void;
   consumed: boolean;
   setConsumed: (consumed: boolean) => void;
-  watchlist: boolean;
-  setWatchlist: (watchlist: boolean) => void;
+  wishlist: boolean;
+  setWishlist: (wishlist: boolean) => void;
 }
 
 export const useMediaStore = create<MediaState>((set, get) => ({
@@ -14,8 +14,8 @@ export const useMediaStore = create<MediaState>((set, get) => ({
   setLiked: (liked) => set({ liked }),
   consumed: false,
   setConsumed: (consumed) => set({ consumed }),
-  watchlist: false,
-  setWatchlist: (watchlist) => set({ watchlist }),
+  wishlist: false,
+  setWishlist: (wishlist) => set({ wishlist }),
 }));
 
 // Optionally, set initial values dynamically
@@ -23,5 +23,5 @@ export const initializeMediaStore = (initial: Partial<MediaState>) => {
   const store = useMediaStore.getState();
   if (initial.liked !== undefined) store.setLiked(initial.liked);
   if (initial.consumed !== undefined) store.setConsumed(initial.consumed);
-  if (initial.watchlist !== undefined) store.setWatchlist(initial.watchlist);
+  if (initial.wishlist !== undefined) store.setWishlist(initial.wishlist);
 };

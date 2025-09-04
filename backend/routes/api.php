@@ -14,7 +14,8 @@ Route::middleware('api')->group(function () {
         if($request->mediaid){
             return response()->json([
                 'liked' => $request->user()->checkLiked($request->mediaid), 
-                'consumed' => $request->user()->checkConsumed($request->mediaid)
+                'consumed' => $request->user()->checkConsumed($request->mediaid),
+                'wishlist' => $request->user()->checkWishlist($request->mediaid)
             ]);
         }else{
             return $request->user()->load('profile');

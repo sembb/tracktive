@@ -70,6 +70,7 @@ export default function WriteReviewSection({media}: any) {
 
                     <MediaLikeButton id={media.id} init={loggedIn} action='like' type={media.mediatype} />
                     <MediaLikeButton id={media.id} init={loggedIn} action='consumed' type={media.mediatype} />
+                    <MediaLikeButton id={media.id} init={loggedIn} action='wishlist' type={media.mediatype} />
                 </fieldset>
 
                 <fieldset className="fieldset">
