@@ -15,7 +15,13 @@ Route::middleware('api')->group(function () {
             return response()->json([
                 'liked' => $request->user()->checkLiked($request->mediaid), 
                 'consumed' => $request->user()->checkConsumed($request->mediaid),
-                'wishlist' => $request->user()->checkWishlist($request->mediaid)
+                'wishlist' => $request->user()->checkWishlist($request->mediaid),
+                'reviewdetails' => [
+                    'score' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->rating ?? null,
+                    'review' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->review_text ?? null,
+                    'date' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->created_at ?? null,
+                ],
+                'user' => $request->user()->load('profile')
             ]);
         }else{
             return $request->user()->load('profile');

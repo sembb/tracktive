@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use App\Models\MediaLike;
 use App\Models\MediaConsumed;
 use App\Models\MediaWishlist;
+use App\Models\Review;
 
 class User extends Authenticatable
 {
@@ -100,6 +101,11 @@ class User extends Authenticatable
     public function consumed()
     {   
         return $this->hasMany(MediaConsumed::class, 'user_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'user_id');
     }
 
     public function wishlist()

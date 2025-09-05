@@ -106,4 +106,34 @@ class MediaController extends Controller
 
         return response()->json(['success' => true, 'liked' => $action === 'like']);
     }
+
+    public function createReview(Request $request)
+    {
+        $data = $request->json()->all();
+        $mediaId = $data['mediaId'] ?? null;
+        $reviewText = $data['review'] ?? null;
+        $rating = $data['score'] ?? null;
+
+        if (!$mediaId || !$reviewText || !$rating) {
+            return response()->json(['error' => 'Missing parameters'], 400);
+        }
+
+        $mediaItem = MediaItem::where('id', $mediaId)->first();
+        if (!$mediaItem) {
+            return response()->json(['error' => 'Media item not found'], 404);
+        }
+
+        // Create the review
+        $mediaItem->reviews()->updateOrCreate(
+            ['user_id' => auth()->id()],
+            [
+            'user_id' => auth()->id(),
+            'review_text' => $reviewText,
+            'rating' => $rating,
+            ]
+            // add any other required columns here
+        );
+
+        return response()->json(['success' => true]);
+    }
 }
