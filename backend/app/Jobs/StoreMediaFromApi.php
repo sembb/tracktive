@@ -42,9 +42,9 @@ class StoreMediaFromApi implements ShouldQueue
             $metadata->tagline = $this->mediaitem['tagline'] ?? '';
             $metadata->runtime = $this->mediaitem['runtime'] ?? 0;
             $newitem = MediaItem::updateOrCreate(
-                ['external_id' => $this->mediaitem['id']],
+                ['id' => $this->mediaitem['id']],
                 [
-                    'external_id' => $this->mediaitem['id'],
+                    'external_id' => $this->mediaitem['external_id'],
                     'external_source' => 'TMDB',
                     'type' => ucfirst($this->type),
                     'title' => $this->mediaitem['title'] ?? 'Untitled',
@@ -96,7 +96,7 @@ class StoreMediaFromApi implements ShouldQueue
         Log::alert("StoreMediaFromApi job failed", [
             'type' => $this->type,
             'message' => $exception->getMessage(),
-            'data' => $this->mediaitem['id'] ?? null,
+            'data' => $this->mediaitem['external_id'] ?? null,
         ]);
 
         // Optional: trigger alert/notification

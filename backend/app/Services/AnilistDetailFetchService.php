@@ -112,7 +112,7 @@ class AnilistDetailFetchService implements MediaDetailFetcherInterface
 
         return [
             'details' => [
-                'id' => $mediaitem['id'],
+                'external_id' => $mediaitem['id'],
                 'title' => $mediaitem['title']['english'] ?? $mediaitem['title']['romaji'] ?? $mediaitem['title']['native'] ?? 'Untitled',
                 'poster_path' => $mediaitem['coverImage']['extraLarge'] ?? null,
                 'overview' => $mediaitem['description'] ?? '',

@@ -8,19 +8,14 @@ export default function useLogout(cookieHeader?: string) {
   const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
 
   const logout = async () => {
-    // 1. Haal CSRF-cookie op (verplicht bij Laravel Sanctum)
-    await fetch(`${apiUrl}/sanctum/csrf-cookie`, {
-      credentials: 'include',
-    })
 
     // 2. Doe het logout request
     const response = await fetch(`${apiUrl}/api/logout`, {
       method: 'POST',
-      credentials: 'include', // belangrijk om de session cookie mee te sturen
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        ...(cookieHeader ? { cookie: cookieHeader } : {}),
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
       },
     })
 

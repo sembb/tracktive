@@ -67,7 +67,7 @@ class MusicDetailFetchService implements MediaDetailFetcherInterface
         return [
             'details' => 
                 [
-                    'id' => $mediaitem['id'],
+                    'external_id' => $mediaitem['id'],
                     'title' => $mediaitem['title'],
                     'overview' => null,
                     'release_date' => $mediaitem['release_date'],

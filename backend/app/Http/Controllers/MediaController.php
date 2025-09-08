@@ -30,6 +30,24 @@ class MediaController extends Controller
         try {
             $fetcher = MediaDetailFetcherFactory::make($type);
             $mediaitem = $fetcher->fetch($id);
+            if(!$model){
+                $newitem = MediaItem::create(
+                    [
+                        'external_id' => $mediaitem['details']['external_id'],
+                        'external_source' => 'TMDB',
+                        'type' => $type,
+                        'title' => '',
+                        'description' => '',
+                        'image_url' => '',
+                        'release_date' => null,
+                        'metadata_json' => null,
+                        'last_synced_at' => now(),
+                    ]
+                );
+                $mediaitem['details']['id'] = $newitem->id;
+            }else{
+                $mediaitem['details']['id'] = $model->id;
+            }
 
         } catch (\RuntimeException $e) {
             return response()->json(['error' => $e->getMessage()], 404);
