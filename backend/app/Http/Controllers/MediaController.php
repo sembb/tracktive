@@ -130,7 +130,7 @@ class MediaController extends Controller
         $data = $request->json()->all();
         $mediaId = $data['mediaId'] ?? null;
         $reviewText = $data['review'] ?? null;
-        $rating = $data['score'] ?? null;
+        $rating = $data['rating'] ?? null;
 
         if (!$mediaId || !$reviewText || !$rating) {
             return response()->json(['error' => 'Missing parameters'], 400);

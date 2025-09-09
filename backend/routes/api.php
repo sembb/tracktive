@@ -8,6 +8,7 @@ use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\MediaController;
 use App\Models\MediaItem;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ReviewController;
 
 Route::middleware('api')->group(function () {
     Route::middleware('auth:sanctum')->get('/user', function(Request $request) {
@@ -17,7 +18,7 @@ Route::middleware('api')->group(function () {
                 'consumed' => $request->user()->checkConsumed($request->mediaid),
                 'wishlist' => $request->user()->checkWishlist($request->mediaid),
                 'reviewdetails' => [
-                    'score' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->rating ?? null,
+                    'rating' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->rating ?? null,
                     'review' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->review_text ?? null,
                     'date' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->created_at ?? null,
                 ],
@@ -81,7 +82,8 @@ Route::middleware('api')->group(function () {
 
     Route::prefix('media')->group(function () {
         Route::post('/action', [MediaController::class, 'handleAction'])->middleware('auth:sanctum');
-        Route::post('/createreview', [MediaController::class, 'createReview'])->middleware('auth:sanctum');
+        Route::post('/createreview', [ReviewController::class, 'createReview'])->middleware('auth:sanctum');
+        Route::get('/reviews/{mediaid}', [ReviewController::class, 'listReviews']);
         Route::get('/{type}', [MediaController::class, 'show'])
             ->where('type', 'movie|anime|album|track|artist');
     });

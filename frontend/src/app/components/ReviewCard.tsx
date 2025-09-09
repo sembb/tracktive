@@ -3,7 +3,7 @@
 import Image from 'next/image';
 
 interface ReviewCardProps extends UserProps {
-  score: number;
+  rating: number;
   review: string;
   date: string; // ISO-string of formatted date
 }
@@ -16,7 +16,7 @@ interface UserProps {
 export default function ReviewCard({
   name,
   profile,
-  score,
+  rating,
   review,
   date,
 }: ReviewCardProps) {
@@ -44,7 +44,7 @@ export default function ReviewCard({
 
             <div className="mb-2">
                 <span className="badge badge-primary text-sm">
-                Score: {score}/100
+                rating: {rating}/100
                 </span>
             </div>
 
