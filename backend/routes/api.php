@@ -19,7 +19,7 @@ Route::middleware('api')->group(function () {
                 'wishlist' => $request->user()->checkWishlist($request->mediaid),
                 'reviewdetails' => [
                     'rating' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->rating ?? null,
-                    'review' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->review_text ?? null,
+                    'review_text' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->review_text ?? null,
                     'date' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->created_at ?? null,
                 ],
                 'user' => $request->user()->load('profile')

@@ -4,8 +4,8 @@ import Image from 'next/image';
 
 interface ReviewCardProps extends UserProps {
   rating: number;
-  review: string;
-  date: string; // ISO-string of formatted date
+  review_text: string;
+  created_at: string; // ISO-string of formatted date
 }
 
 interface UserProps {
@@ -17,8 +17,8 @@ export default function ReviewCard({
   name,
   profile,
   rating,
-  review,
-  date,
+  review_text,
+  created_at,
 }: ReviewCardProps) {
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
 
@@ -38,7 +38,7 @@ export default function ReviewCard({
                 </div>
                 <div>
                     <h4 className="font-bold text-lg">{name}</h4>
-                    <span className="text-sm opacity-70">{new Date(date).toLocaleDateString()}</span>
+                    <span className="text-sm opacity-70">{new Date(created_at).toLocaleDateString()}</span>
                 </div>
             </div>
 
@@ -48,7 +48,7 @@ export default function ReviewCard({
                 </span>
             </div>
 
-            <p className="text-base">{review}</p>
+            <p className="text-base">{review_text}</p>
         </div>
     );
 }

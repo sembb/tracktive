@@ -14,7 +14,7 @@ class ReviewController extends Controller
     {
         $data = $request->json()->all();
         $mediaId = $data['mediaId'] ?? null;
-        $reviewText = $data['review'] ?? null;
+        $reviewText = $data['review_text'] ?? null;
         $rating = $data['rating'] ?? null;
 
         if (!$mediaId || !$reviewText || !$rating) {
@@ -49,7 +49,7 @@ class ReviewController extends Controller
 
         $reviews = $mediaItem->reviews()
             ->with(['user:id,name', 'user.profile:avatar_url,user_id'])
-            ->paginate(10);
+            ->paginate(1);
 
         return response()->json($reviews);
     }

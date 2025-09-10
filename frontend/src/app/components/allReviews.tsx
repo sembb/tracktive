@@ -7,7 +7,7 @@ import ReviewCard from "./ReviewCard";
 export default function AllReviews({ mediaId }: { mediaId: string }) {
 
     console.log('media:', mediaId);
-console.log('external_id type:', typeof mediaId);
+    console.log('external_id type:', typeof mediaId);
 
     const [reviews, setReviews] = useState<any[]>([]);
     const [page, setPage] = useState(1);
@@ -19,11 +19,39 @@ console.log('external_id type:', typeof mediaId);
         fetch(`${apiUrl}/api/media/reviews/${mediaId}?page=${page}`)
             .then((res) => res.json())
             .then((data) => {
+                console.log('reviews:', data.data);
                 setReviews(data.data);
-                setLastPage(data.meta.last_page);
+                setLastPage(data.last_page);
+                
             });
-            console.log(reviews);
     }, [page]);
+
+    const getPageNumbers = () => {
+        const delta = 2; // how many pages to show around current
+        const range: (number | string)[] = [];
+        const rangeWithDots: (number | string)[] = [];
+        let l: number | null = null;
+
+        for (let i = 1; i <= lastPage; i++) {
+        if (i === 1 || i === lastPage || (i >= page - delta && i <= page + delta)) {
+            range.push(i);
+        }
+        }
+
+        for (let i of range) {
+        if (l !== null) {
+            if ((i as number) - l === 2) {
+            rangeWithDots.push(l + 1);
+            } else if ((i as number) - l !== 1) {
+            rangeWithDots.push("...");
+            }
+        }
+        rangeWithDots.push(i);
+        l = i as number;
+        }
+
+        return rangeWithDots;
+    };
 
     
 
@@ -32,6 +60,27 @@ console.log('external_id type:', typeof mediaId);
             {reviews.map((review) => (
                 <ReviewCard {...review} {...review.user} />
             ))}
+
+            <div>
+                <span className="block">Page {page} of {lastPage}</span>
+                <button className="btn" onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</button>
+
+                {getPageNumbers().map((p, idx) =>
+                    p === "..." ? (
+                        <span key={idx}>...</span>
+                    ) : (
+                        <button
+                        key={idx}
+                        onClick={() => setPage(p as number)}
+                        className={p === page ? "font-bold underline btn" : "btn"}
+                        >
+                        {p}
+                        </button>
+                    )
+                )}
+
+                <button className="btn" onClick={() => setPage(page + 1)} disabled={page === lastPage}>Next</button>
+            </div>
         </>
     );
 }

@@ -18,7 +18,7 @@ export default function WriteReviewSection({media}: any) {
             const user = await fetchUserFromServer(media.id);
             console.log('user state:', user);
             setLoggedIn(user);
-            if(user?.reviewdetails.rating || user?.reviewdetails.review || user?.reviewdetails.date){
+            if(user?.reviewdetails.rating || user?.reviewdetails.review_text || user?.reviewdetails.date){
                 setUserReview(user?.reviewdetails ?? null);
             }else{
                 setUserReview(null);
@@ -59,7 +59,7 @@ export default function WriteReviewSection({media}: any) {
             body: JSON.stringify({
                 mediaId: media.id,
                 rating: formData.get('rating'),
-                review: formData.get('review'),
+                review_text: formData.get('review_text'),
             }),
             headers: {
                 'Accept': 'application/json',
@@ -74,7 +74,7 @@ export default function WriteReviewSection({media}: any) {
             dialog.close();
             setUserReview({
                 rating: formData.get('rating'),
-                review: formData.get('review'),
+                review_text: formData.get('review_text'),
                 date: new Date().toISOString(),
             });
         } else {
@@ -129,7 +129,7 @@ export default function WriteReviewSection({media}: any) {
                     
                         <fieldset className="fieldset">
                             <legend className="fieldset-legend">Your review</legend>
-                            <textarea defaultValue={loggedIn.reviewdetails.review ?? ''} name="review" className="textarea textarea-bordered w-full" placeholder="Write your review here..."></textarea>
+                            <textarea defaultValue={loggedIn.reviewdetails.review_text ?? ''} name="review_text" className="textarea textarea-bordered w-full" placeholder="Write your review here..."></textarea>
                         </fieldset>
                         <input type="submit" value="Submit" className="btn mt-2" />
                     </form>
