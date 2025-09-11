@@ -27,7 +27,7 @@ class TmdbDetailFetchService implements MediaDetailFetcherInterface
         $cast = collect($credits->json()['cast'] ?? [])->map(function ($member) {
             return [
                 'original_name' => $member['name'] ?? 'Unknown',
-                'character' => $member['original_name'] ?? '',
+                'character' => $member['character'] ?? '',
                 'character_image_url' => null,
                 'actor_image_url' => $member['profile_path'] ?? null,
                 'type' => 'actor',

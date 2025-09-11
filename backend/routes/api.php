@@ -20,7 +20,7 @@ Route::middleware('api')->group(function () {
                 'reviewdetails' => [
                     'rating' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->rating ?? null,
                     'review_text' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->review_text ?? null,
-                    'date' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->created_at ?? null,
+                    'created_at' => $request->user()->reviews()->where('media_item_id', $request->mediaid)->first()?->created_at ?? null,
                 ],
                 'user' => $request->user()->load('profile')
             ]);

@@ -70,6 +70,8 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 						height={500}
 						alt="Album cover"
 					/>
+
+					<WriteReviewSection media={normalizedMovie} />
 				</div>
 				<div>
 					<h1 className='font-bebas text-6xl'>{normalizedMovie.title}</h1>
@@ -77,8 +79,8 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 					<span>{normalizedMovie.release_date}</span>
           			<div className='my-4'>{normalizedMovie.description}</div>
 				</div>
-				<WriteReviewSection media={normalizedMovie} />
 			</div>
+			
         </div>
     )
 }

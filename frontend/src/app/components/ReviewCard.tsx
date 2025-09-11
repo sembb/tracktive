@@ -23,7 +23,7 @@ export default function ReviewCard({
     const apiUrl = process.env.NEXT_PUBLIC_API_ADDRESS || 'http://localhost:8000';
 
     return (
-        <div className="card bg-base-200 shadow-xl p-4 rounded-2xl w-full max-w-md">
+        <div className="card bg-base-200 shadow-xl p-4 rounded-2xl w-full">
             <div className="flex items-center gap-4 mb-3">
                 <div className="avatar">
                     <div className="w-12 h-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">

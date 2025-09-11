@@ -56,31 +56,35 @@ export default function AllReviews({ mediaId }: { mediaId: string }) {
     
 
     return (
+        reviews.length > 0 ? (
         <>
             {reviews.map((review) => (
-                <ReviewCard {...review} {...review.user} />
+                <div className="my-8"><ReviewCard {...review} {...review.user} /></div>
             ))}
 
             <div>
-                <span className="block">Page {page} of {lastPage}</span>
-                <button className="btn" onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</button>
+                <span className="block mb-2">Page {page} of {lastPage}</span>
+                <div className="flex gap-1">
+                    <button className="btn" onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</button>
 
-                {getPageNumbers().map((p, idx) =>
-                    p === "..." ? (
-                        <span key={idx}>...</span>
-                    ) : (
-                        <button
-                        key={idx}
-                        onClick={() => setPage(p as number)}
-                        className={p === page ? "font-bold underline btn" : "btn"}
-                        >
-                        {p}
-                        </button>
-                    )
-                )}
+                    {getPageNumbers().map((p, idx) =>
+                        p === "..." ? (
+                            <span key={idx}>...</span>
+                        ) : (
+                            <button
+                            key={idx}
+                            onClick={() => setPage(p as number)}
+                            className={p === page ? "font-bold underline btn" : "btn"}
+                            >
+                            {p}
+                            </button>
+                        )
+                    )}
 
-                <button className="btn" onClick={() => setPage(page + 1)} disabled={page === lastPage}>Next</button>
+                    <button className="btn" onClick={() => setPage(page + 1)} disabled={page === lastPage}>Next</button>
+                </div>
             </div>
         </>
+        ) : <p>No reviews yet.</p>
     );
 }

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import CastList from './CastList';
+import WriteReviewSection from '@/app/components/WriteReviewSection';
 
 interface Movie {
   title: string;
@@ -44,6 +45,8 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 		: movie.metadata_json || '';
 
 	const normalizedMovie = {
+		id: movie.id,
+		mediatype: 'movie',
 		title: movie.title,
 		release_date: movie.release_date,
 		image_url: movie.poster_path || movie.image_url, // eerst API, anders DB
@@ -63,6 +66,8 @@ export default async function Page({params, }: { params: Promise<{ slug: string 
 						height={500}
 						alt="Movie poster"
 					/>
+
+					<WriteReviewSection media={normalizedMovie} />
 				</div>
 				<div>
 					<h1 className='font-bebas text-6xl'>{normalizedMovie.title}</h1>

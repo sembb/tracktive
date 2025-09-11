@@ -18,7 +18,7 @@ export default function WriteReviewSection({media}: any) {
             const user = await fetchUserFromServer(media.id);
             console.log('user state:', user);
             setLoggedIn(user);
-            if(user?.reviewdetails.rating || user?.reviewdetails.review_text || user?.reviewdetails.date){
+            if(user?.reviewdetails.rating || user?.reviewdetails.review_text || user?.reviewdetails.created_at){
                 setUserReview(user?.reviewdetails ?? null);
             }else{
                 setUserReview(null);
@@ -87,11 +87,12 @@ export default function WriteReviewSection({media}: any) {
     return(
         <>
             {loggedIn ? (
-            <div>
+            <div className="my-8">
+                <button className="btn mb-4" onClick={()=>document.getElementById('my_modal_3').showModal()}>Write a review</button>
                 {userReview ? (
-                    <ReviewCard {...userReview} {...loggedIn.user} />
+                    <ReviewCard {...loggedIn.user} {...userReview}  />
                 ) : null}
-                <button className="btn" onClick={()=>document.getElementById('my_modal_3').showModal()}>Write a review</button>
+                
                 <dialog id="my_modal_3" className="modal">
                 <div className="modal-box">
                     <form method="dialog">
@@ -105,7 +106,7 @@ export default function WriteReviewSection({media}: any) {
                                 <legend className="fieldset-legend">Review rating</legend>
                                 <div className="flex flex-col gap-6">
                                     <input
-                                    defaultValue={loggedIn.reviewdetails.rating ?? ''}
+                                    defaultValue={loggedIn.reviewdetails?.rating ?? ''}
                                     type="number"
                                     name="rating"
                                     className="input input-xl validator text-3xl w-30 text-center"
@@ -129,7 +130,7 @@ export default function WriteReviewSection({media}: any) {
                     
                         <fieldset className="fieldset">
                             <legend className="fieldset-legend">Your review</legend>
-                            <textarea defaultValue={loggedIn.reviewdetails.review_text ?? ''} name="review_text" className="textarea textarea-bordered w-full" placeholder="Write your review here..."></textarea>
+                            <textarea defaultValue={loggedIn.reviewdetails?.review_text ?? ''} name="review_text" className="textarea textarea-bordered w-full" placeholder="Write your review here..."></textarea>
                         </fieldset>
                         <input type="submit" value="Submit" className="btn mt-2" />
                     </form>
